@@ -1,0 +1,14 @@
+#!/usr/bin/env sh
+
+root_dir_pathname="$(dirname "$0")/.."
+
+cd "$root_dir_pathname"
+
+python3 -m venv --copies venv
+. venv/bin/activate
+pip3 install --upgrade pip
+pip3 install pip-autoremove pip3-autoremove
+pip3 install pip-tools
+pip-compile --strip-extras -o requirements.txt
+pip-compile --strip-extras --extra dev -o requirements-dev.txt
+pip-sync requirements.txt requirements-dev.txt

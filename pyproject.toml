@@ -1,0 +1,35 @@
+[build-system]
+requires = [
+    "setuptools",
+    "setuptools-scm",
+    ]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "i2w"
+authors = [
+    { name="Daniel Spagnol", email="dspagnol@gmail.com" },
+    ]
+description = "Integer to words. Given an integer, i2w outputs it as words."
+license = { file = "LICENSE" }
+readme = "README.md"
+requires-python = ">=3.11"
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Environment :: Console",
+    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+    "Operating System :: Unix",
+    "Programming Language :: Python :: 3",
+    "Topic :: Utilities",
+    ]
+dynamic = [
+    "optional-dependencies",
+    "version",
+    ]
+
+[project.scripts]
+i2w = "i2w.cli:main"
+
+[tool.setuptools.dynamic]
+optional-dependencies.dev = { file = ["scripts/requirements-dev.in"] }
+version = { attr = "i2w.__version__" }

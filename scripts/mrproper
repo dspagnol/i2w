@@ -1,0 +1,16 @@
+#!/usr/bin/env sh
+
+root_dir_pathname="$(dirname "$0")/.."
+
+cd "$root_dir_pathname"
+
+rm -rf .mypy_cache
+rm -rf .ruff_cache
+rm -rf build
+rm -rf requirements-dev.txt
+rm -rf requirements.txt
+rm -rf sample/__pycache__
+rm -rf src/i2w.egg-info
+rm -rf src/i2w/__pycache__
+rm -rf tests/__pycache__
+rm -rf venv
