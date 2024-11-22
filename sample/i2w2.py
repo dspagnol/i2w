@@ -1,16 +1,15 @@
 import logging
 
-from i2w import Converter
-from i2w import LoggingDebugFilter
+import i2w
 
 
 logging.basicConfig(level=logging.INFO)
 
-converter = Converter('fr_CA')
+converter = i2w.Converter('fr_CA')
 
 print(converter.to_words(200123))
 
-logging_filter = LoggingDebugFilter(debug_level=2)
+logging_filter = i2w.LoggingDebugFilter(debug_level=2)
 for handler in logging.root.handlers:
     handler.addFilter(logging_filter)
 logging.getLogger().setLevel(logging.DEBUG)
