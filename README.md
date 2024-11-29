@@ -35,25 +35,25 @@ zero
 one
 ```
 
-Specific locale:
+Specific locale (in Linux, run `locale -a` to see all locales installed):
 
 ```bash
 $ i2w -l C 1000000000
 one billion
 
-$ i2w -l en_US 1000000000
+$ i2w -l en_US 1000000000  # or it can be en_US.utf8
 one billion
 
-$ i2w -l en_GB 1000000000
+$ i2w -l en_GB 1000000000  # or it can be en_GB.utf8
 one thousand million
 
-$ i2w -l fr_CA 1000000000
+$ i2w -l fr_CA 1000000000  # or it can be fr_CA.utf8
 un milliard
 
-$ i2w -l fr_FR 1000000000
+$ i2w -l fr_FR 1000000000  # or it can be fr_FR.utf8
 un-milliard
 
-$ i2w -l pt_BR 1000000000
+$ i2w -l pt_BR 1000000000  # or it can be pt_BR.utf8
 um bilhão
 ```
 
