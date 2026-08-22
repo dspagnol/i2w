@@ -13,7 +13,7 @@ authors = [
 description = "Integer to words. Given an integer, i2w outputs it as words."
 license = { file = "LICENSE" }
 readme = "README.md"
-requires-python = ">=3.11"
+requires-python = ">=3.12"
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Environment :: Console",
@@ -33,3 +33,45 @@ i2w = "i2w.cli:main"
 [tool.setuptools.dynamic]
 optional-dependencies.dev = { file = ["scripts/requirements-dev.in"] }
 version = { attr = "i2w.__version__" }
+
+[tool.ruff]
+line-length = 88
+target-version = "py312"
+exclude = [
+    ".git",
+    ".venv",
+    "build",
+    "dist",
+    "*.egg-info",
+]
+
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle errors
+    "F",   # Pyflakes
+    "W",   # pycodestyle warnings
+    "D",   # pydocstyle (docstrings)
+    "I",   # isort (import sorting)
+]
+ignore = [
+    "D104",  # Missing docstring in public package
+    "D100",  # Missing docstring in public module (we'll add these)
+]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.black]
+line-length = 88
+target-version = ["py312"]
+include = '\.pyi?$'
+extend-exclude = '''
+/(
+  # directories
+  \.eggs
+  | \.git
+  | \.venv
+  | build
+  | dist
+)
+'''

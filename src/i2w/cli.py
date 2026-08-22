@@ -3,22 +3,26 @@ import logging
 import sys
 
 from .converter import Converter
-from .exception import InvalidInteger
-from .exception import I2WException
+from .exception import I2WException, InvalidInteger
 from .logging import LoggingDebugFilter
 
 
 def initialize_log(verbose_level: int) -> None:
+    """Initialize logging with appropriate verbosity level.
+
+    Args:
+        verbose_level: The verbosity level (0=ERROR, 1=DEBUG, 2+=more debug).
+    """
     logging_level: int = logging.INFO
     if verbose_level:
         logging_level = logging.DEBUG
-    LOGGING_FORMAT = '%(levelname)s: %(message)s'
+    LOGGING_FORMAT = "%(levelname)s: %(message)s"
     logging.basicConfig(format=LOGGING_FORMAT, level=logging_level)
-    logging.addLevelName(logging.FATAL, 'fatal')
-    logging.addLevelName(logging.ERROR, 'error')
-    logging.addLevelName(logging.WARN,  'warn ')
-    logging.addLevelName(logging.INFO,  'info ')
-    logging.addLevelName(logging.DEBUG, 'debug')
+    logging.addLevelName(logging.FATAL, "fatal")
+    logging.addLevelName(logging.ERROR, "error")
+    logging.addLevelName(logging.WARN, "warn ")
+    logging.addLevelName(logging.INFO, "info ")
+    logging.addLevelName(logging.DEBUG, "debug")
     if verbose_level:
         logging_filter = LoggingDebugFilter(debug_level=verbose_level)
         for handler in logging.root.handlers:
@@ -26,16 +30,23 @@ def initialize_log(verbose_level: int) -> None:
 
 
 def parse_arguments() -> argparse.Namespace:
-    parser = argparse.ArgumentParser('i2w') # TODO put program name to in a variable
-    parser.add_argument('--locale', '-l')
-    parser.add_argument('--verbose', '-v', action='count', default=0, dest='verbose_level')
-    parser.add_argument('numbers', type=int, nargs='*', default=[])
+    """Parse and return command-line arguments.
+
+    Returns:
+        Parsed command-line arguments namespace.
+    """
+    parser = argparse.ArgumentParser("i2w")  # TODO put program name to in a variable
+    parser.add_argument("--locale", "-l")
+    parser.add_argument(
+        "--verbose", "-v", action="count", default=0, dest="verbose_level"
+    )
+    parser.add_argument("numbers", type=int, nargs="*", default=[])
     args = parser.parse_args()
     return args
 
 
 def main() -> None:
-
+    """Main entry point for the i2w command-line application."""
     sys.set_int_max_str_digits(maxdigits=0)
 
     args = parse_arguments()
@@ -83,5 +94,5 @@ def main() -> None:
         exit(1)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

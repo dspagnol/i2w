@@ -3,14 +3,10 @@ import collections.abc
 import logging
 import typing
 
-from ._constants import ConverterImplTypeValue
-from ._constants import Gender
+from ._constants import ConverterImplTypeValue, Gender
 from ._illion import IllionConverter
 from ._localization import Localization
-from ._logging import logger
-from ._logging import logger_d1
-from ._logging import logger_d2
-from ._logging import logger_d3
+from ._logging import logger, logger_d1, logger_d2, logger_d3
 from .exception import InternalError
 
 
@@ -24,9 +20,11 @@ class ConverterImpl(metaclass=abc.ABCMeta):
 
 
 class ConverterRegistrar:
+    """Registry for mapping converter implementation types to their classes."""
 
-    @staticmethod
-    def register(type_id: ConverterImplTypeValue, type: typing.Type[ConverterImpl]) -> None:
+    def register(
+        type_id: ConverterImplTypeValue, type: typing.Type[ConverterImpl]
+    ) -> None:
         ConverterRegistrar.__registered_types[type_id] = type
 
     @staticmethod
@@ -37,8 +35,15 @@ class ConverterRegistrar:
 
 
 class ScaleConverterImpl(ConverterImpl):
+    """Base converter for scale-based number systems (short and long scale).
 
-    def __init__(self, localization: Localization, name: str, slope: int, intercept: int):
+    Uses mathematical formulas to calculate exponents based on slope and intercept
+    parameters, allowing both short-scale (1000^n) and long-scale (1000000^n) systems.
+    """
+
+    def __init__(
+        self, localization: Localization, name: str, slope: int, intercept: int
+    ):
         self.__localization = localization
         self.__name = name
         self.__slope = slope
@@ -46,7 +51,7 @@ class ScaleConverterImpl(ConverterImpl):
 
     def to_words(self, i: int) -> str:
 
-        logger.debug('processing %d', i)
+        logger.debug("processing %d", i)
 
         word_list: list[str] = []
         is_negative: bool = False
@@ -65,7 +70,9 @@ class ScaleConverterImpl(ConverterImpl):
             max_step: int = self.__get_n_steps() - 1
             conjunction_appended: bool = False
 
-            spc: ScaledPeriodConverter = ScaledPeriodConverter(self.__localization, exponent_calculator=self.__calculate_exponent)
+            spc: ScaledPeriodConverter = ScaledPeriodConverter(
+                self.__localization, exponent_calculator=self.__calculate_exponent
+            )
 
             # Input "i" is converted to str for performances purposes.
             # If "i" is too large, the "a = i % 1000" and "i //= 1000" operations are
@@ -81,14 +88,20 @@ class ScaleConverterImpl(ConverterImpl):
                 i1: int = i2 - 3
                 if i1 < 0:
                     i1 = 0
-                a: int = int(i_str[i1:i2]) # extract the next 3 characters (backward) and make int.
+                a: int = int(
+                    i_str[i1:i2]
+                )  # extract the next 3 characters (backward) and make int.
 
                 # equivalent to "i //= 1000"
                 i2 -= 3
 
                 if a:
                     reversed_word_list.append(spc.to_words(a=a, n=n, step=step))
-                    if not conjunction_appended and i1 and spc.is_conjunction_prepended_candidate(a=a):
+                    if (
+                        not conjunction_appended
+                        and i1
+                        and spc.is_conjunction_prepended_candidate(a=a)
+                    ):
                         reversed_word_list.append(self.__localization.and_)
                         conjunction_appended = True
 
@@ -102,7 +115,7 @@ class ScaleConverterImpl(ConverterImpl):
 
         words: str = self.__localization.word_separator.join(word_list)
         if is_negative:
-            words = f'{self.__localization.minus} {words}'
+            words = f"{self.__localization.minus} {words}"
 
         return words
 
@@ -114,41 +127,56 @@ class ScaleConverterImpl(ConverterImpl):
 
     def __get_first_n(self) -> int:
         # 3*(a*n+b) = 0  ==>  n = -b/a
-        return - self.__intercept // self.__slope
+        return -self.__intercept // self.__slope
 
     def __calculate_exponent(self, n: int, step: int) -> int:
         return 3 * (self.__slope * n + self.__intercept + step)
 
 
 class ShortScaleConverterImpl(ScaleConverterImpl):
+    """Converter for short-scale number system (used in US, modern British)."""
 
     def __init__(self, localization: Localization):
         # short scale: 10 ** ((1 * n + 1) * 3)
-        super().__init__(localization=localization, name='short', slope=1, intercept=1)
+        super().__init__(localization=localization, name="short", slope=1, intercept=1)
 
 
 class LongScaleConverterImpl(ScaleConverterImpl):
+    """Converter for long-scale number system (used in European countries)."""
 
     def __init__(self, localization: Localization):
         # long scale:  10 ** ((2 * n + 0) * 3)
-        super().__init__(localization=localization, name='long', slope=2, intercept=0)
+        super().__init__(localization=localization, name="long", slope=2, intercept=0)
 
 
-ConverterRegistrar.register(type_id=ConverterImplTypeValue.SHORT_SCALE, type=ShortScaleConverterImpl)
-ConverterRegistrar.register(type_id=ConverterImplTypeValue.LONG_SCALE, type=LongScaleConverterImpl)
+ConverterRegistrar.register(
+    type_id=ConverterImplTypeValue.SHORT_SCALE, type=ShortScaleConverterImpl
+)
+ConverterRegistrar.register(
+    type_id=ConverterImplTypeValue.LONG_SCALE, type=LongScaleConverterImpl
+)
 
 
 class ScaledPeriodConverter:
+    """Converts a 3-digit group within a scaled number system to words.
+
+    Handles the conversion of individual periods (groups of 3 digits) along with
+    their scale names (e.g., million, billion). Supports illion names and thousands.
+    """
 
     def __init__(
-            self,
-            localization: Localization,
-            exponent_calculator: collections.abc.Callable[[int, int], int],
-            ) -> None:
+        self,
+        localization: Localization,
+        exponent_calculator: collections.abc.Callable[[int, int], int],
+    ) -> None:
         self.__localization = localization
         self.__calculate_exponent = exponent_calculator
-        self.__period: PeriodConverter = PeriodConverter(localization=self.__localization)
-        self.__illion: IllionConverter = IllionConverter(localization=self.__localization)
+        self.__period: PeriodConverter = PeriodConverter(
+            localization=self.__localization
+        )
+        self.__illion: IllionConverter = IllionConverter(
+            localization=self.__localization
+        )
 
     def is_conjunction_prepended_candidate(self, a: int) -> bool:
         is_candidate: bool = False
@@ -156,51 +184,71 @@ class ScaledPeriodConverter:
             tens_units: int = a % 100
             hundreds: int = a // 100
             is_candidate = (hundreds == 0) ^ (tens_units == 0)
-            logger_d2.debug('conjunction prepended candidate: %d00+0%d => %s', hundreds, tens_units, is_candidate)
+            logger_d2.debug(
+                "conjunction prepended candidate: %d00+0%d => %s",
+                hundreds,
+                tens_units,
+                is_candidate,
+            )
         return is_candidate
 
     def to_words(self, a: int, n: int, step: int) -> str:
-    
+
         reversed_words: list[str] = []
         has_thousand: bool = False
         is_large_number: bool = n > 0
         if n > 0:
-            logger_d1.debug('illion: n=%d, step=%d', n, step)
+            logger_d1.debug("illion: n=%d, step=%d", n, step)
             has_thousand = self.__has_thousand(step)
-            is_plural = not self.__localization.large_number_invariable and (a > 1 or has_thousand)
-            reversed_words.append(self.__illion.to_words(n=n, step=step, plural=is_plural, gender=Gender.MALE))
+            is_plural = not self.__localization.large_number_invariable and (
+                a > 1 or has_thousand
+            )
+            reversed_words.append(
+                self.__illion.to_words(
+                    n=n, step=step, plural=is_plural, gender=Gender.MALE
+                )
+            )
         elif self.__is_thousand(n=n, step=step):
-            logger_d1.debug('thousand: n=%d, step=%d', n, step)
+            logger_d1.debug("thousand: n=%d, step=%d", n, step)
             has_thousand = True
             reversed_words.append(self.__localization.thousand)
 
         if not (has_thousand and a == 1 and self.__localization.omit_one_from_thousand):
             if logger.isEnabledFor(logging.DEBUG):
                 if n <= 0 and not has_thousand:
-                    logger_d1.debug('hundreds: a=%d', a)
-                logger_d2.debug('period: a=%d', a)
-            reversed_words.append(self.__period.to_words(a, large_number=is_large_number))
+                    logger_d1.debug("hundreds: a=%d", a)
+                logger_d2.debug("period: a=%d", a)
+            reversed_words.append(
+                self.__period.to_words(a, large_number=is_large_number)
+            )
 
         words: str = self.__localization.word_separator.join(reversed(reversed_words))
-        logger_d2.debug('words: %s', words)
+        logger_d2.debug("words: %s", words)
         return words
 
     def __has_thousand(self, step: int) -> bool:
-        return step > 0 and self.__localization.large_number_thousand_replaces_ard_suffix
+        return (
+            step > 0 and self.__localization.large_number_thousand_replaces_ard_suffix
+        )
 
     def __is_thousand(self, n: int, step: int) -> bool:
         return self.__calculate_exponent(n, step) == 3
 
 
 class PeriodConverter:
+    """Converts a number less than 1000 to its word representation.
+
+    Handles decomposition into hundreds, tens, and units with appropriate
+    localization rules for conjunctions and plural forms.
+    """
 
     def __init__(self, localization: Localization) -> None:
         self.__localization = localization
 
     def to_words(self, a: int, large_number: bool) -> str:
         if not 1 <= a <= 999:
-            raise InternalError(f'small positive number not in range: {a}')
-        words: str = ''
+            raise InternalError(f"small positive number not in range: {a}")
+        words: str = ""
         if a == 1 and large_number:
             words = self.__localization.large_number_1
         else:
@@ -211,28 +259,44 @@ class PeriodConverter:
                     words = self.__lower_than_100_to_words(a=lower_than_100)
                 hundreds = a // 100
                 if hundreds:
-                    plural_hundred: bool = hundreds != 1 and lower_than_100 == 0 and self.__localization.plural_hundred0
-                    n_hundreds_words = self.__hundreds_to_words(hundreds=hundreds, plural=plural_hundred)
+                    plural_hundred: bool = (
+                        hundreds != 1
+                        and lower_than_100 == 0
+                        and self.__localization.plural_hundred0
+                    )
+                    n_hundreds_words = self.__hundreds_to_words(
+                        hundreds=hundreds, plural=plural_hundred
+                    )
                     if words:
                         if self.__localization.conjunction_before_tens:
-                            words = f'{self.__localization.and_}{self.__localization.word_separator}{words}'
-                        words = f'{n_hundreds_words}{self.__localization.word_separator}{words}'
+                            sep = self.__localization.word_separator
+                            words = f"{self.__localization.and_}{sep}{words}"
+                        sep = self.__localization.word_separator
+                        words = f"{n_hundreds_words}{sep}{words}"
                     else:
                         words = n_hundreds_words
                 self.__localization.put_name_in_cache(i=a, words=words)
             else:
-                logger_d3.debug('got lower than 1000 from cache')
+                logger_d3.debug("got lower than 1000 from cache")
         return words
 
     def __lower_than_100_to_words(self, a: int) -> str:
-        words: str = ''
+        """Convert a number 1-99 to its word representation.
+
+        Args:
+            a: Integer from 1 to 99 to convert.
+
+        Returns:
+            Word representation of the number with proper conjunctions and separators.
+        """
+        words: str = ""
         if not 1 <= a <= 99:
-            raise InternalError(f'small positive number not in range: {a}')
+            raise InternalError(f"small positive number not in range: {a}")
         words = self.__localization.get_name_from_cache(i=a)
         if not words:
             units = a % 10
             tens = a // 10 % 10
-            logger_d3.debug('hundreds decomposed: %d0+0%d', tens, units)
+            logger_d3.debug("hundreds decomposed: %d0+0%d", tens, units)
             if units:
                 u: int = units
                 if tens in [7, 9] and self.__localization.tens_7_and_9_as_fr:
@@ -243,17 +307,23 @@ class PeriodConverter:
                 if words:
                     has_conjunction: bool = False
                     if (
-                            self.__localization.conjunction_before_units or
-                            units == 1 and (
-                                tens < 8 and self.__localization.conjunction_before_1_unit_if_lt_80 or
-                                tens == 8 and self.__localization.conjunction_before_1_unit_if_eq_80 or
-                                tens == 9 and self.__localization.conjunction_before_1_unit_if_eq_90
-                                )
-                            ):
+                        self.__localization.conjunction_before_units
+                        or units == 1
+                        and (
+                            tens < 8
+                            and self.__localization.conjunction_before_1_unit_if_lt_80
+                            or tens == 8
+                            and self.__localization.conjunction_before_1_unit_if_eq_80
+                            or tens == 9
+                            and self.__localization.conjunction_before_1_unit_if_eq_90
+                        )
+                    ):
                         has_conjunction = True
                     word_separator: str
                     if has_conjunction:
-                        word_separator = self.__localization.word_separator_11_99_conjunction
+                        word_separator = (
+                            self.__localization.word_separator_11_99_conjunction
+                        )
                     else:
                         word_separator = self.__localization.word_separator_11_99
                     word_list: list[str] = [tens_name]
@@ -265,13 +335,26 @@ class PeriodConverter:
                     words = tens_name
             self.__localization.put_name_in_cache(i=a, words=words)
         else:
-            logger_d3.debug('got lower than 100 from cache')
+            logger_d3.debug("got lower than 100 from cache")
         return words
 
     def __hundreds_to_words(self, hundreds: int, plural: bool) -> str:
+        """Convert hundreds value to its word representation.
+
+        Args:
+            hundreds: The hundreds digit (1-9).
+            plural: Whether to use plural form for the word "hundred".
+
+        Returns:
+            Word representation of the hundreds value.
+        """
         hundreds_words = self.__localization.hundreds_name(hundreds)
         if not hundreds_words:
-            hundreds_words = self.__localization.hundreds if plural else self.__localization.hundred
+            hundreds_words = (
+                self.__localization.hundreds if plural else self.__localization.hundred
+            )
             if hundreds != 1 or not self.__localization.omit_one_from_hundred:
-                hundreds_words = f'{self.__localization.get_name_from_cache(i=hundreds)}{self.__localization.word_separator}{hundreds_words}'
+                num_word = self.__localization.get_name_from_cache(i=hundreds)
+                sep = self.__localization.word_separator
+                hundreds_words = f"{num_word}{sep}{hundreds_words}"
         return hundreds_words

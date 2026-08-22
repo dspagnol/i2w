@@ -1,0 +1,11 @@
+#!/bin/env sh
+
+# Format code
+black --line-length=88 src/i2w/
+
+# Check compliance
+ruff check src/i2w/
+black --check src/i2w/
+
+# Run tests
+pytest tests/
