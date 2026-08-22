@@ -22,7 +22,7 @@ from .exception import LocalizationError
 class Localization:
     """Layer on top of multi-language objects for translations and rules."""
 
-    def __init__(self, locale_: str = "") -> None:
+    def __init__(self, locale_: str | None = "") -> None:
         """Create a localization object.
 
         Args:

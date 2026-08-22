@@ -81,8 +81,8 @@ pip3 uninstall i2w
 ## Useful Commands for i2w Developers
 
 ```bash
-# run all unit tests and semantics checks (requirements: mypy and ruff)
-python3 -m unittest && mypy tests && mypy src && ruff check
+# run all unit tests and semantics checks (requirements: pytest, mypy and ruff)
+pytest && mypy tests && mypy src && ruff check
 
 # usage without installation
 python3 -m src.i2w 123

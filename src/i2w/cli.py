@@ -57,7 +57,7 @@ def main() -> None:
         success: bool = False
         try:
             is_int: bool = True
-            i: int
+            i: int = 0
             if isinstance(x, int):
                 i = x
             else:
