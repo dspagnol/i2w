@@ -15,10 +15,6 @@ class I2WError(Exception):
         super().__init__(*args)
 
 
-# Backward compatibility alias
-I2WException = I2WError
-
-
 class LocalizationError(I2WError):
     """Raised when an invalid or unsupported locale is provided."""
 

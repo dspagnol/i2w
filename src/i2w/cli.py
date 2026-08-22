@@ -3,7 +3,7 @@ import logging
 import sys
 
 from .converter import Converter
-from .exception import I2WException, InvalidInteger
+from .exception import I2WError, InvalidInteger
 from .logging import LoggingDebugFilter
 
 
@@ -87,7 +87,7 @@ def main() -> None:
             for line in sys.stdin:
                 for s in line.split():
                     success &= process_number(converter, s)
-    except I2WException as e:
+    except I2WError as e:
         logging.error(str(e))
         success = False
     except KeyboardInterrupt:
