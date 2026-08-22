@@ -529,7 +529,7 @@ STR_LIST_LIST_PROPERTIES: LanguageDict[dict[StrListListProperty, list[list[str]]
                 ["m", "x"],
                 [],
             ],
-        }
+        },
     },
 }
 

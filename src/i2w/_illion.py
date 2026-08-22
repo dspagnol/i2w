@@ -21,11 +21,16 @@ from .exception import InternalError
 
 
 class IllionConverter:
-
     def __init__(self, localization: Localization) -> None:
         self.__localization = localization
 
-    def to_words(self, n: int, step: int, plural: bool, gender: Gender) -> str:
+    def to_words(
+        self,
+        n: int,
+        step: int,
+        plural: bool,
+        gender: Gender,  # noqa: ARG002
+    ) -> str:
         if n < 0:
             raise InternalError(f"negative n not supported: {n}")
         reversed_base_word_parts: list[str] = []
@@ -37,7 +42,8 @@ class IllionConverter:
         use_thousand: bool = self.__use_thousand(step=step)
         infix_suffix: str = self.__localization.large_number_infix_suffix
         suffix: str = self.__get_suffix(
-            step=(0 if use_thousand else step), plural=plural
+            step=(0 if use_thousand else step),
+            plural=plural,
         )
         words: str = infix_suffix.join([prefix, suffix])
         if use_thousand:
@@ -68,17 +74,19 @@ class IllionConverter:
             )
             if use_alternative_prefix:
                 base_word_parts.append(
-                    self.__localization.large_number_units_alt(index=units)
+                    self.__localization.large_number_units_alt(index=units),
                 )
             else:
                 base_word_parts.append(
-                    self.__localization.large_number_units(index=units)
+                    self.__localization.large_number_units(index=units),
                 )
             if liaison:
                 base_word_parts.append(liaison)
             base_word_parts.append(
                 self.__localization.large_number_tens(index=t)
-                + self.__localization.large_number_tens_i_a(index=t)[0 if h == 0 else 1]
+                + self.__localization.large_number_tens_i_a(index=t)[
+                    0 if h == 0 else 1
+                ],
             )
             base_word_parts.append(self.__localization.large_number_hundreds(index=h))
         return "".join(base_word_parts)

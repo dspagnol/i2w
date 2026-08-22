@@ -16,8 +16,8 @@ def initialize_log(verbose_level: int) -> None:
     logging_level: int = logging.INFO
     if verbose_level:
         logging_level = logging.DEBUG
-    LOGGING_FORMAT = "%(levelname)s: %(message)s"
-    logging.basicConfig(format=LOGGING_FORMAT, level=logging_level)
+    logging_format = "%(levelname)s: %(message)s"
+    logging.basicConfig(format=logging_format, level=logging_level)
     logging.addLevelName(logging.FATAL, "fatal")
     logging.addLevelName(logging.ERROR, "error")
     logging.addLevelName(logging.WARN, "warn ")
@@ -38,7 +38,11 @@ def parse_arguments() -> argparse.Namespace:
     parser = argparse.ArgumentParser("i2w")  # TODO put program name to in a variable
     parser.add_argument("--locale", "-l")
     parser.add_argument(
-        "--verbose", "-v", action="count", default=0, dest="verbose_level"
+        "--verbose",
+        "-v",
+        action="count",
+        default=0,
+        dest="verbose_level",
     )
     parser.add_argument("numbers", type=int, nargs="*", default=[])
     args = parser.parse_args()
@@ -79,11 +83,10 @@ def main() -> None:
         converter = Converter(args.locale)
         for s in args.numbers:
             success &= process_number(converter, s)
-        if len(args.numbers) == 0:
-            if sys.stdin.readable():
-                for line in sys.stdin:
-                    for s in line.split():
-                        success &= process_number(converter, s)
+        if len(args.numbers) == 0 and sys.stdin.readable():
+            for line in sys.stdin:
+                for s in line.split():
+                    success &= process_number(converter, s)
     except I2WException as e:
         logging.error(str(e))
         success = False
@@ -91,7 +94,7 @@ def main() -> None:
         pass
 
     if not success:
-        exit(1)
+        sys.exit(1)
 
 
 if __name__ == "__main__":

@@ -25,7 +25,7 @@ class Converter:
         impl_type: ConverterImplTypeValue = localization.get_impl_type()
         logger.debug("converter: %s", str(impl_type))
         self.__impl: ConverterImpl = ConverterRegistrar.get_class(type_id=impl_type)(
-            localization=localization
+            localization=localization,
         )
 
     def to_words(self, i: int) -> str:

@@ -11,9 +11,8 @@ from .exception import InternalError
 
 
 class ConverterImpl(metaclass=abc.ABCMeta):
-
     @abc.abstractmethod
-    def __init__(self, localization: Localization): ...
+    def __init__(self, localization: Localization) -> None: ...
 
     @abc.abstractmethod
     def to_words(self, i: int) -> str: ...
@@ -22,16 +21,20 @@ class ConverterImpl(metaclass=abc.ABCMeta):
 class ConverterRegistrar:
     """Registry for mapping converter implementation types to their classes."""
 
+    @staticmethod
     def register(
-        type_id: ConverterImplTypeValue, type: typing.Type[ConverterImpl]
+        type_id: ConverterImplTypeValue,
+        converter_type: type[ConverterImpl],
     ) -> None:
-        ConverterRegistrar.__registered_types[type_id] = type
+        ConverterRegistrar.__registered_types[type_id] = converter_type
 
     @staticmethod
-    def get_class(type_id: ConverterImplTypeValue) -> typing.Type[ConverterImpl]:
+    def get_class(type_id: ConverterImplTypeValue) -> type[ConverterImpl]:
         return ConverterRegistrar.__registered_types[type_id]
 
-    __registered_types: dict[ConverterImplTypeValue, typing.Type[ConverterImpl]] = {}
+    __registered_types: typing.ClassVar[
+        dict[ConverterImplTypeValue, type[ConverterImpl]]
+    ] = {}
 
 
 class ScaleConverterImpl(ConverterImpl):
@@ -42,8 +45,12 @@ class ScaleConverterImpl(ConverterImpl):
     """
 
     def __init__(
-        self, localization: Localization, name: str, slope: int, intercept: int
-    ):
+        self,
+        localization: Localization,
+        name: str,
+        slope: int,
+        intercept: int,
+    ) -> None:
         self.__localization = localization
         self.__name = name
         self.__slope = slope
@@ -71,7 +78,8 @@ class ScaleConverterImpl(ConverterImpl):
             conjunction_appended: bool = False
 
             spc: ScaledPeriodConverter = ScaledPeriodConverter(
-                self.__localization, exponent_calculator=self.__calculate_exponent
+                self.__localization,
+                exponent_calculator=self.__calculate_exponent,
             )
 
             # Input "i" is converted to str for performances purposes.
@@ -83,13 +91,11 @@ class ScaleConverterImpl(ConverterImpl):
 
             i2: int = len(i_str)
             while i2 > 0:
-
                 # equivalent to "a = i % 1000"
                 i1: int = i2 - 3
-                if i1 < 0:
-                    i1 = 0
+                i1 = max(i1, 0)
                 a: int = int(
-                    i_str[i1:i2]
+                    i_str[i1:i2],
                 )  # extract the next 3 characters (backward) and make int.
 
                 # equivalent to "i //= 1000"
@@ -136,7 +142,7 @@ class ScaleConverterImpl(ConverterImpl):
 class ShortScaleConverterImpl(ScaleConverterImpl):
     """Converter for short-scale number system (used in US, modern British)."""
 
-    def __init__(self, localization: Localization):
+    def __init__(self, localization: Localization) -> None:
         # short scale: 10 ** ((1 * n + 1) * 3)
         super().__init__(localization=localization, name="short", slope=1, intercept=1)
 
@@ -144,16 +150,18 @@ class ShortScaleConverterImpl(ScaleConverterImpl):
 class LongScaleConverterImpl(ScaleConverterImpl):
     """Converter for long-scale number system (used in European countries)."""
 
-    def __init__(self, localization: Localization):
+    def __init__(self, localization: Localization) -> None:
         # long scale:  10 ** ((2 * n + 0) * 3)
         super().__init__(localization=localization, name="long", slope=2, intercept=0)
 
 
 ConverterRegistrar.register(
-    type_id=ConverterImplTypeValue.SHORT_SCALE, type=ShortScaleConverterImpl
+    type_id=ConverterImplTypeValue.SHORT_SCALE,
+    converter_type=ShortScaleConverterImpl,
 )
 ConverterRegistrar.register(
-    type_id=ConverterImplTypeValue.LONG_SCALE, type=LongScaleConverterImpl
+    type_id=ConverterImplTypeValue.LONG_SCALE,
+    converter_type=LongScaleConverterImpl,
 )
 
 
@@ -172,10 +180,10 @@ class ScaledPeriodConverter:
         self.__localization = localization
         self.__calculate_exponent = exponent_calculator
         self.__period: PeriodConverter = PeriodConverter(
-            localization=self.__localization
+            localization=self.__localization,
         )
         self.__illion: IllionConverter = IllionConverter(
-            localization=self.__localization
+            localization=self.__localization,
         )
 
     def is_conjunction_prepended_candidate(self, a: int) -> bool:
@@ -205,8 +213,11 @@ class ScaledPeriodConverter:
             )
             reversed_words.append(
                 self.__illion.to_words(
-                    n=n, step=step, plural=is_plural, gender=Gender.MALE
-                )
+                    n=n,
+                    step=step,
+                    plural=is_plural,
+                    gender=Gender.MALE,
+                ),
             )
         elif self.__is_thousand(n=n, step=step):
             logger_d1.debug("thousand: n=%d, step=%d", n, step)
@@ -219,7 +230,7 @@ class ScaledPeriodConverter:
                     logger_d1.debug("hundreds: a=%d", a)
                 logger_d2.debug("period: a=%d", a)
             reversed_words.append(
-                self.__period.to_words(a, large_number=is_large_number)
+                self.__period.to_words(a, large_number=is_large_number),
             )
 
         words: str = self.__localization.word_separator.join(reversed(reversed_words))
@@ -265,7 +276,8 @@ class PeriodConverter:
                         and self.__localization.plural_hundred0
                     )
                     n_hundreds_words = self.__hundreds_to_words(
-                        hundreds=hundreds, plural=plural_hundred
+                        hundreds=hundreds,
+                        plural=plural_hundred,
                     )
                     if words:
                         if self.__localization.conjunction_before_tens:
@@ -306,29 +318,24 @@ class PeriodConverter:
                 tens_name = self.__localization.tens_name(index=tens)
                 if words:
                     has_conjunction: bool = False
-                    if (
-                        self.__localization.conjunction_before_units
-                        or units == 1
+                    loc = self.__localization
+                    if loc.conjunction_before_units or (
+                        units == 1
                         and (
-                            tens < 8
-                            and self.__localization.conjunction_before_1_unit_if_lt_80
-                            or tens == 8
-                            and self.__localization.conjunction_before_1_unit_if_eq_80
-                            or tens == 9
-                            and self.__localization.conjunction_before_1_unit_if_eq_90
+                            (tens < 8 and loc.conjunction_before_1_unit_if_lt_80)
+                            or (tens == 8 and loc.conjunction_before_1_unit_if_eq_80)
+                            or (tens == 9 and loc.conjunction_before_1_unit_if_eq_90)
                         )
                     ):
                         has_conjunction = True
                     word_separator: str
                     if has_conjunction:
-                        word_separator = (
-                            self.__localization.word_separator_11_99_conjunction
-                        )
+                        word_separator = loc.word_separator_11_99_conjunction
                     else:
-                        word_separator = self.__localization.word_separator_11_99
+                        word_separator = loc.word_separator_11_99
                     word_list: list[str] = [tens_name]
                     if has_conjunction:
-                        word_list.append(self.__localization.and_)
+                        word_list.append(loc.and_)
                     word_list.append(words)
                     words = word_separator.join(word_list)
                 else:

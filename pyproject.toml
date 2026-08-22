@@ -47,19 +47,62 @@ exclude = [
 
 [tool.ruff.lint]
 select = [
-    "E",   # pycodestyle errors
-    "F",   # Pyflakes
-    "W",   # pycodestyle warnings
-    "D",   # pydocstyle (docstrings)
-    "I",   # isort (import sorting)
+    "A",    # flake8-builtins (shadowing builtins)
+    "ANN",  # flake8-annotations (type annotations)
+    "ARG",  # flake8-unused-arguments
+    "ASYNC",# flake8-async
+    "B",    # flake8-bugbear (common bugs)
+    "C4",   # flake8-comprehensions
+    "COM",  # flake8-commas
+    "D",    # pydocstyle (docstrings)
+    "E",    # pycodestyle errors
+    "F",    # Pyflakes
+    "I",    # isort (import sorting)
+    "N",    # pep8-naming
+    "PERF", # perflint (performance anti-patterns)
+    "PIE",  # flake8-pie
+    "PLR",  # pylint refactor
+    "PT",   # flake8-pytest-style
+    "RUF",  # ruff-specific rules
+    "SIM",  # flake8-simplify
+    "UP",   # pyupgrade (modern Python syntax)
+    "W",    # pycodestyle warnings
 ]
 ignore = [
+    # Docstring related
+    "D100",  # Missing docstring in public module
     "D104",  # Missing docstring in public package
-    "D100",  # Missing docstring in public module (we'll add these)
+    # Annotation related (we'll add progressively)
+    "ANN001", # Missing type annotation for function argument
+    "ANN002", # Missing type annotation for *args
+    "ANN003", # Missing type annotation for **kwargs
+    # Other exceptions
+    "N818",   # Exception naming (backward compat for public exceptions)
+    "PLR0915", # Too many statements (acceptable for complex initialization)
+    "PLR2004", # Magic value used in comparison
+    "RUF001",  # Ambiguous unicode character
 ]
 
 [tool.ruff.lint.pydocstyle]
 convention = "google"
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = [
+    "ANN",   # Type annotations not critical in tests
+    "D",     # Docstrings not required in test code
+    "E501",  # Line length less critical in test code
+    "I",     # Import sorting less critical in test code
+    "SIM108", # Ternary operator preference not critical in tests
+]
+"**/__init__.py" = [
+    "F401",  # Unused imports in __init__.py (often used for exports)
+]
+
+[tool.pyright]
+typeCheckingMode = "strict"
+pythonVersion = "3.12"
+venvPath = "."
+venv = "venv"
 
 [tool.black]
 line-length = 88

@@ -11,7 +11,11 @@ type LanguageDict[T] = dict[str | None, TerritoryDict[T]]
 
 
 class Enum(enum.Enum):
-
     @staticmethod
-    def _generate_next_value_(name, start, count, last_values) -> int:
+    def _generate_next_value_(
+        _name: str,
+        _start: int,
+        count: int,
+        _last_values: object,
+    ) -> int:
         return count + 1

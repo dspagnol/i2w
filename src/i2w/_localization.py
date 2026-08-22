@@ -52,50 +52,50 @@ class Localization:
         logger_d1.debug("using territory: %s", self.__territory)
 
         self.__conjunction_before_units = self.__get_bool_property(
-            key=BoolProperty.CONJUNCTION_BEFORE_UNITS
+            key=BoolProperty.CONJUNCTION_BEFORE_UNITS,
         )
         self.__conjunction_before_tens = self.__get_bool_property(
-            key=BoolProperty.CONJUNCTION_BEFORE_TENS
+            key=BoolProperty.CONJUNCTION_BEFORE_TENS,
         )
         self.__conjunction_before_1_unit_if_lt_80 = self.__get_bool_property(
-            key=BoolProperty.CONJUNCTION_BEFORE_1_UNIT_IF_LT_80
+            key=BoolProperty.CONJUNCTION_BEFORE_1_UNIT_IF_LT_80,
         )
         self.__conjunction_before_1_unit_if_eq_80 = self.__get_bool_property(
-            key=BoolProperty.CONJUNCTION_BEFORE_1_UNIT_IF_EQ_80
+            key=BoolProperty.CONJUNCTION_BEFORE_1_UNIT_IF_EQ_80,
         )
         self.__conjunction_before_1_unit_if_eq_90 = self.__get_bool_property(
-            key=BoolProperty.CONJUNCTION_BEFORE_1_UNIT_IF_EQ_90
+            key=BoolProperty.CONJUNCTION_BEFORE_1_UNIT_IF_EQ_90,
         )
         self.__conjunction_before_last_non_0_period = self.__get_bool_property(
-            key=BoolProperty.CONJUNCTION_BEFORE_LAST_NON_0_PERIOD
+            key=BoolProperty.CONJUNCTION_BEFORE_LAST_NON_0_PERIOD,
         )
         self.__tens_7_and_9_as_fr = self.__get_bool_property(
-            key=BoolProperty.TENS_7_AND_9_AS_FR
+            key=BoolProperty.TENS_7_AND_9_AS_FR,
         )
         self.__plural_hundred0 = self.__get_bool_property(
-            key=BoolProperty.PLURAL_HUNDRED00
+            key=BoolProperty.PLURAL_HUNDRED00,
         )
         self.__omit_one_from_hundred = self.__get_bool_property(
-            key=BoolProperty.OMIT_ONE_FROM_HUNDRED
+            key=BoolProperty.OMIT_ONE_FROM_HUNDRED,
         )
         self.__omit_one_from_thousand = self.__get_bool_property(
-            key=BoolProperty.OMIT_ONE_FROM_THOUSAND
+            key=BoolProperty.OMIT_ONE_FROM_THOUSAND,
         )
         self.__large_number_invariable = self.__get_bool_property(
-            key=BoolProperty.LARGE_NUMBER_INVARIABLE
+            key=BoolProperty.LARGE_NUMBER_INVARIABLE,
         )
         self.__large_number_thousand_replaces_ard_suffix = self.__get_bool_property(
-            key=BoolProperty.LARGE_NUMBER_THOUSAND_REPLACES_ARD_SUFFIX
+            key=BoolProperty.LARGE_NUMBER_THOUSAND_REPLACES_ARD_SUFFIX,
         )
         self.__large_number_no_liaison_use_alt_unit_prefix = self.__get_bool_property(
-            key=BoolProperty.LARGE_NUMBER_NO_LIAISON_USE_ALT_UNIT_PREFIX
+            key=BoolProperty.LARGE_NUMBER_NO_LIAISON_USE_ALT_UNIT_PREFIX,
         )
         self.__word_separator = self.__get_str_property(key=StrProperty.WORD_SEPARATOR)
         self.__word_separator_11_99 = self.__get_str_property(
-            key=StrProperty.WORD_SEPARATOR_11_99
+            key=StrProperty.WORD_SEPARATOR_11_99,
         )
         self.__word_separator_11_99_conjunction = self.__get_str_property(
-            key=StrProperty.WORD_SEPARATOR_11_99_CONJUNCTION
+            key=StrProperty.WORD_SEPARATOR_11_99_CONJUNCTION,
         )
         self.__minus = self.__get_str_property(key=StrProperty.MINUS)
         self.__and = self.__get_str_property(key=StrProperty.AND)
@@ -104,47 +104,47 @@ class Localization:
         self.__thousand = self.__get_str_property(key=StrProperty.THOUSAND)
         self.__large_number_1 = self.__get_str_property(key=StrProperty.LARGE_NUMBER_1)
         self.__large_number_infix_base = self.__get_str_property(
-            key=StrProperty.LARGE_NUMBER_INFIX_BASE
+            key=StrProperty.LARGE_NUMBER_INFIX_BASE,
         )
         self.__large_number_infix_suffix = self.__get_str_property(
-            key=StrProperty.LARGE_NUMBER_INFIX_SUFFIX
+            key=StrProperty.LARGE_NUMBER_INFIX_SUFFIX,
         )
         self.__tens_names = self.__get_str_list_property(key=StrListProperty.TENS_NAMES)
         self.__hundreds_names = self.__get_str_list_property(
-            key=StrListProperty.HUNDREDS_NAMES
+            key=StrListProperty.HUNDREDS_NAMES,
         )
         self.__large_number_suffixes = self.__get_str_list_property(
-            key=StrListProperty.LARGE_NUMBER_SUFFIXES
+            key=StrListProperty.LARGE_NUMBER_SUFFIXES,
         )
         self.__large_number_suffixes_plural = self.__get_str_list_property(
-            key=StrListProperty.LARGE_NUMBER_SUFFIXES_PLURAL
+            key=StrListProperty.LARGE_NUMBER_SUFFIXES_PLURAL,
         )
         self.__large_number_prefixes_n_lt_10 = self.__get_str_list_property(
-            key=StrListProperty.LARGE_NUMBER_PREFIXES_N_LT_10
+            key=StrListProperty.LARGE_NUMBER_PREFIXES_N_LT_10,
         )
         self.__large_number_units = self.__get_str_list_property(
-            key=StrListProperty.LARGE_NUMBER_UNITS
+            key=StrListProperty.LARGE_NUMBER_UNITS,
         )
         self.__large_number_units_alt = self.__get_str_list_property(
-            key=StrListProperty.LARGE_NUMBER_UNITS_ALT
+            key=StrListProperty.LARGE_NUMBER_UNITS_ALT,
         )
         self.__large_number_tens = self.__get_str_list_property(
-            key=StrListProperty.LARGE_NUMBER_TENS
+            key=StrListProperty.LARGE_NUMBER_TENS,
         )
         self.__large_number_hundreds = self.__get_str_list_property(
-            key=StrListProperty.LARGE_NUMBER_HUNDREDS
+            key=StrListProperty.LARGE_NUMBER_HUNDREDS,
         )
         self.__large_number_units_liaison = self.__get_str_list_list_property(
-            key=StrListListProperty.LARGE_NUMBER_UNITS_LIASON
+            key=StrListListProperty.LARGE_NUMBER_UNITS_LIASON,
         )
         self.__large_number_tens_liaison = self.__get_str_list_list_property(
-            key=StrListListProperty.LARGE_NUMBER_TENS_LIASON
+            key=StrListListProperty.LARGE_NUMBER_TENS_LIASON,
         )
         self.__large_number_tens_i_a = self.__get_str_list_list_property(
-            key=StrListListProperty.LARGE_NUMBER_TENS_I_A
+            key=StrListListProperty.LARGE_NUMBER_TENS_I_A,
         )
         self.__large_number_hundreds_liasion = self.__get_str_list_list_property(
-            key=StrListListProperty.LARGE_NUMBER_HUNDREDS_LIASON
+            key=StrListListProperty.LARGE_NUMBER_HUNDREDS_LIASON,
         )
         self.__cache: dict[int, str] = {}
 
@@ -271,84 +271,104 @@ class Localization:
 
     def hundreds_name(self, index: int) -> str:
         return self.__get_entry_from_str_list(
-            str_list=self.__hundreds_names, index=index
+            str_list=self.__hundreds_names,
+            index=index,
         )
 
     def large_number_suffixes(self, index: int) -> str:
         return self.__get_entry_from_str_list(
-            str_list=self.__large_number_suffixes, index=index
+            str_list=self.__large_number_suffixes,
+            index=index,
         )
 
     def large_number_suffixes_plural(self, index: int) -> str:
         return self.__get_entry_from_str_list(
-            str_list=self.__large_number_suffixes_plural, index=index
+            str_list=self.__large_number_suffixes_plural,
+            index=index,
         )
 
     def large_number_prefixes_n_lt_10(self, index: int) -> str:
         return self.__get_entry_from_str_list(
-            str_list=self.__large_number_prefixes_n_lt_10, index=index
+            str_list=self.__large_number_prefixes_n_lt_10,
+            index=index,
         )
 
     def large_number_units(self, index: int) -> str:
         return self.__get_entry_from_str_list(
-            str_list=self.__large_number_units, index=index
+            str_list=self.__large_number_units,
+            index=index,
         )
 
     def large_number_units_alt(self, index: int) -> str:
         return self.__get_entry_from_str_list(
-            str_list=self.__large_number_units_alt, index=index
+            str_list=self.__large_number_units_alt,
+            index=index,
         )
 
     def large_number_tens(self, index: int) -> str:
         return self.__get_entry_from_str_list(
-            str_list=self.__large_number_tens, index=index
+            str_list=self.__large_number_tens,
+            index=index,
         )
 
     def large_number_hundreds(self, index: int) -> str:
         return self.__get_entry_from_str_list(
-            str_list=self.__large_number_hundreds, index=index
+            str_list=self.__large_number_hundreds,
+            index=index,
         )
 
     def large_number_units_liaison(self, index: int) -> list[str]:
         return self.__get_entry_from_str_list_list(
-            str_list_list=self.__large_number_units_liaison, index=index
+            str_list_list=self.__large_number_units_liaison,
+            index=index,
         )
 
     def large_number_tens_liaison(self, index: int) -> list[str]:
         return self.__get_entry_from_str_list_list(
-            str_list_list=self.__large_number_tens_liaison, index=index
+            str_list_list=self.__large_number_tens_liaison,
+            index=index,
         )
 
     def large_number_tens_i_a(self, index: int) -> list[str]:
         return self.__get_entry_from_str_list_list(
-            str_list_list=self.__large_number_tens_i_a, index=index
+            str_list_list=self.__large_number_tens_i_a,
+            index=index,
         )
 
     def large_number_hundreds_liasion(self, index: int) -> list[str]:
         return self.__get_entry_from_str_list_list(
-            str_list_list=self.__large_number_hundreds_liasion, index=index
+            str_list_list=self.__large_number_hundreds_liasion,
+            index=index,
         )
 
     def __get_bool_property(self, key: BoolProperty) -> bool:
         """Retrieve a boolean property from localization data with default fallback."""
         return self.__get_dict_entry(
-            dictionary=BOOL_PROPERTIES, key=key, default_value=False
+            dictionary=BOOL_PROPERTIES,
+            key=key,
+            default_value=False,
         )
 
     def __get_str_property(self, key: StrProperty) -> str:
         """Retrieve a string property from localization data with default fallback."""
         return self.__get_dict_entry(
-            dictionary=STR_PROPERTIES, key=key, default_value=""
+            dictionary=STR_PROPERTIES,
+            key=key,
+            default_value="",
         )
 
     def __get_str_list_property(self, key: StrListProperty) -> list[str]:
         return self.__get_dict_entry(
-            dictionary=STR_LIST_PROPERTIES, key=key, default_value=[""]
+            dictionary=STR_LIST_PROPERTIES,
+            key=key,
+            default_value=[""],
         )
 
     def __get_str_list_list_property(self, key: StrListListProperty) -> list[list[str]]:
         return self.__get_dict_entry(
-            dictionary=STR_LIST_LIST_PROPERTIES, key=key, default_value=[[""]]
+            dictionary=STR_LIST_LIST_PROPERTIES,
+            key=key,
+            default_value=[[""]],
         )
 
     def __get_entry_from_str_list(self, str_list: list[str], index: int) -> str:
@@ -357,14 +377,19 @@ class Localization:
         return str_list[index]
 
     def __get_entry_from_str_list_list(
-        self, str_list_list: list[list[str]], index: int
+        self,
+        str_list_list: list[list[str]],
+        index: int,
     ) -> list[str]:
         if index > len(str_list_list) - 1:
             index = 0
         return str_list_list[index]
 
     def __get_dict_entry[K, V](
-        self, dictionary: LanguageDict[dict[K, V]], key: K, default_value: V
+        self,
+        dictionary: LanguageDict[dict[K, V]],
+        key: K,
+        default_value: V,
     ) -> V:
         """Retrieve a value from a language/territory-keyed dictionary with fallbacks.
 
@@ -374,7 +399,7 @@ class Localization:
         dict_fallback_1: dict[K, V]
         dict_fallback_2: dict[K, V]
         dict_preferred, dict_fallback_1, dict_fallback_2 = self.__get_language_dicts(
-            dictionary
+            dictionary,
         )
         value: V = default_value
         if key in dict_preferred:
@@ -386,7 +411,8 @@ class Localization:
         return value
 
     def __get_language_dicts[K, V](
-        self, dictionary: LanguageDict[dict[K, V]]
+        self,
+        dictionary: LanguageDict[dict[K, V]],
     ) -> tuple[dict[K, V], dict[K, V], dict[K, V]]:
         """Resolve language/territory dictionaries with fallback chain.
 
