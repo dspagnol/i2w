@@ -9,7 +9,7 @@ This guide contains information for developers who want to contribute to or work
 The project includes a convenience script to set up everything:
 
 ```bash
-bash scripts/create_dev_venv
+bash scripts/venv_create
 ```
 
 This script:

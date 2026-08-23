@@ -5,8 +5,10 @@ root_dir_pathname="$(dirname "$0")/.."
 cd "$root_dir_pathname"
 
 rm -rf .mypy_cache
+rm -rf .pytest_cache
 rm -rf .ruff_cache
 rm -rf build
+rm -rf dist
 rm -rf requirements-dev.txt
 rm -rf requirements.txt
 rm -rf sample/__pycache__
