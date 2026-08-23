@@ -36,7 +36,12 @@ def parse_arguments() -> argparse.Namespace:
         Parsed command-line arguments namespace.
     """
     parser = argparse.ArgumentParser("i2w")  # TODO put program name to in a variable
-    parser.add_argument("--locale", "-l")
+    parser.add_argument(
+        "--locale",
+        "-l",
+        default=None,
+        help="POSIX locale (e.g., 'en_US', 'fr_FR'). Defaults to system locale.",
+    )
     parser.add_argument(
         "--verbose",
         "-v",
@@ -80,7 +85,7 @@ def main() -> None:
     success: bool = True
 
     try:
-        converter = Converter(args.locale)
+        converter = Converter(locale_name=args.locale)
         for s in args.numbers:
             success &= process_number(converter, s)
         if len(args.numbers) == 0 and sys.stdin.readable():

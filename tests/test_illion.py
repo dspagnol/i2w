@@ -8,7 +8,7 @@ class TestIllionNLT10:
         gender = Gender.MALE
         for data in self.get_test_data():
             locale_, step, plural, words = data
-            localization = Localization(locale_=locale_)
+            localization = Localization(locale_name=locale_)
             n = 1
             for word in words:
                 converter = IllionConverter(localization=localization)
@@ -252,7 +252,7 @@ class TestIllionNLT100:
         gender = Gender.MALE
         for data in self.get_test_data():
             locale_, step, plural, words = data
-            localization = Localization(locale_=locale_)
+            localization = Localization(locale_name=locale_)
             n = 10
             for word in words:
                 converter = IllionConverter(localization=localization)

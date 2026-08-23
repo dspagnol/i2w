@@ -1,4 +1,5 @@
 import locale
+import re
 
 from ._constants import (
     BOOL_PROPERTIES,
@@ -22,32 +23,64 @@ from .exception import LocalizationError
 class Localization:
     """Layer on top of multi-language objects for translations and rules."""
 
-    def __init__(self, locale_: str | None = "") -> None:
+    def __init__(self, locale_name: str | None = None) -> None:
         """Create a localization object.
 
         Args:
-            locale_: POSIX format locale with optional language, territory,
-                     codeset, and modifier components. Defaults to system locale.
+            locale_name: POSIX format locale with optional language, territory,
+                         codeset, and modifier components (e.g., 'en_US',
+                         'fr_FR.UTF-8').
+
+                         When a language-only code is provided (e.g., 'en', 'fr'),
+                         the constructor automatically deduces the most common
+                         territory for that language:
+                         - 'en' -> 'en_US'
+                         - 'fr' -> 'fr_FR'
+                         - 'es' -> 'es_ES'
+                         - 'pt' -> 'pt_PT'
+
+                         If None or empty string, defaults to the system's
+                         environment locale.
+
+                         Supported locale formats:
+                         - 'lang' (territory auto-deduced)
+                         - 'lang_TERRITORY'
+                         - 'lang_TERRITORY.codeset'
+
+                         Example supported locales:
+                         - English: en, en_US, en_GB
+                         - French: fr, fr_FR, fr_BE, fr_CH, fr_CA
+                         - Spanish: es, es_ES
+                         - Portuguese: pt, pt_PT, pt_BR
         """
         self.__language: str | None = None  # ISO 639
         self.__territory: str | None = None  # ISO 3166-1 alpha-2
-        if locale_ is None:
-            locale_ = ""
-        try:
-            locale.setlocale(locale.LC_ALL, locale_)
-        except locale.Error as e:
-            if locale_:
-                raise LocalizationError(locale_) from e
+
+        language_code: str | None = None
+        if locale_name is None:
+            language_code, _encoding = locale.getlocale()
+            logger.debug("detected locale: %s", language_code)
+        else:
+            language_code = locale.normalize(localename=locale_name)
         language_and_territory: str | None = None
-        language_and_territory, _ = locale.getlocale(locale.LC_MESSAGES)
-        logger.debug("detected locale: %s", language_and_territory)
-        language: str | None = None
-        territory: str | None = None
-        if language_and_territory is not None:
-            [language, territory] = language_and_territory.split("_")
-        self.__language_and_territory = language_and_territory
-        self.__language = language
-        self.__territory = territory
+        if language_code is not None:
+            pattern = r"(\w+)(?:\.[\w-]+)?"
+            match = re.match(pattern, language_code)
+            if match:
+                language_and_territory = match.group(1)
+            else:
+                raise LocalizationError(language_code)
+        if language_and_territory is not None and language_and_territory != "C":
+            language: str | None = None
+            territory: str | None = None
+            pattern = r"([a-z]{2,3})(?:_([A-Z]{2}))?"
+            match = re.match(pattern, language_and_territory)
+            if match:
+                language, territory = match.group(1), match.group(2)
+            else:
+                raise LocalizationError(language_and_territory)
+            self.__language = language
+            self.__territory = territory
         logger_d1.debug("using language:  %s", self.__language)
         logger_d1.debug("using territory: %s", self.__territory)
 

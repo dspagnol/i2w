@@ -1,6 +1,10 @@
 # i2w
 
-Convert integers to their word representations in multiple languages.
+A Python library to convert integers to their word representations in multiple languages.
+
+## Overview
+
+**i2w** is primarily a **library for programmers** that provides robust, locale-aware integer-to-words conversion. It comes with a command-line interface for convenience and testing.
 
 ## Features
 
@@ -8,6 +12,7 @@ Convert integers to their word representations in multiple languages.
 - **Multiple number systems**: Supports both short scale (US/modern) and long scale (UK/traditional) for large numbers
 - **Large number support**: Handles arbitrarily large integers
 - **Locale-aware**: Automatically adapts formatting based on system or specified locale
+- **Programmer-friendly API**: Simple, intuitive interface for integration into Python applications
 
 ## Installation
 
@@ -25,9 +30,41 @@ cd i2w
 pip install .
 ```
 
-## Quick Start
+## Library Usage
 
-Basic usage:
+The primary use case is as a library in Python applications:
+
+```python
+from i2w import Converter
+
+# Use system locale
+converter = Converter()
+print(converter.to_words(123))  # "one hundred twenty-three"
+
+# Use specific locale
+converter_fr = Converter(locale_name="fr_FR")
+print(converter_fr.to_words(123))  # "cent-vingt-trois"
+
+# Override with a different locale
+converter_pt = Converter(locale_name="pt_BR")
+print(converter_pt.to_words(1000000))  # "um milhão"
+```
+
+### Locale Parameter
+
+The `locale_name` parameter accepts POSIX locale strings (e.g., `"en_US"`, `"fr_FR"`, `"pt_BR"`):
+
+- **Default behavior**: If `locale_name` is not specified or is an empty string, the library automatically uses the system's environment locale
+- **Override locale**: Explicitly pass a locale string to override the system locale
+
+Supported locales include:
+
+- **English**: `en_US`, `en_GB`
+- **French**: `fr_FR`, `fr_BE`, `fr_CH`, `fr_CA`
+- **Spanish**: `es_ES`
+- **Portuguese**: `pt_PT`, `pt_BR`
+
+## Command-Line Interface
 
 ```bash
 $ i2w 123
@@ -51,9 +88,7 @@ zero
 one
 ```
 
-## Usage
-
-### Command-Line Interface
+### Usage
 
 Print help and available options:
 
