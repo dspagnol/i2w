@@ -1,22 +1,31 @@
 # i2w
 
-Integer to words. Given an integer, i2w outputs it as words.
+Convert integers to their word representations in multiple languages.
 
-As of today, the following languages are supported:
+## Features
 
-- English
-- French
-- Portuguese
-- Spanish
+- **Multi-language support**: English, French, Portuguese, and Spanish
+- **Multiple number systems**: Supports both short scale (US/modern) and long scale (UK/traditional) for large numbers
+- **Large number support**: Handles arbitrarily large integers
+- **Locale-aware**: Automatically adapts formatting based on system or specified locale
 
-## Install i2w from source
+## Installation
+
+### From PyPI
 
 ```bash
-# clone the repo, go to the project root directory and run the command below
-pip3 install .
+pip install i2w
 ```
 
-## Usage
+### From Source
+
+```bash
+git clone https://github.com/dspagnol/i2w.git
+cd i2w
+pip install .
+```
+
+## Quick Start
 
 Basic usage:
 
@@ -29,35 +38,21 @@ zero
 one
 minus thirty-two
 one million
+```
 
+Read from stdin:
+
+```bash
 $ echo "0 1" | i2w
 zero
 one
 ```
 
-Specific locale (in Linux, run `locale -a` to see all locales installed):
+## Usage
 
-```bash
-$ i2w -l C 1000000000
-one billion
+### Command-Line Interface
 
-$ i2w -l en_US 1000000000  # or it can be en_US.utf8
-one billion
-
-$ i2w -l en_GB 1000000000  # or it can be en_GB.utf8
-one thousand million
-
-$ i2w -l fr_CA 1000000000  # or it can be fr_CA.utf8
-un milliard
-
-$ i2w -l fr_FR 1000000000  # or it can be fr_FR.utf8
-un-milliard
-
-$ i2w -l pt_BR 1000000000  # or it can be pt_BR.utf8
-um bilhão
-```
-
-Print help:
+Print help and available options:
 
 ```bash
 $ i2w -h
@@ -72,48 +67,44 @@ options:
   --verbose, -v
 ```
 
-## Uninstall i2w
+### Locale-Specific Conversion
+
+By default, i2w uses your system locale. You can specify a different locale:
 
 ```bash
-pip3 uninstall i2w
+$ i2w -l en_US 1000000000
+one billion
+
+$ i2w -l en_GB 1000000000
+one thousand million
+
+$ i2w -l fr_FR 1000000000
+un-milliard
+
+$ i2w -l pt_BR 1000000000
+um bilhão
 ```
 
-## Useful Commands for i2w Developers
+**Note**: On Linux, run `locale -a` to see all available locales on your system.
+
+### Advanced Usage
+
+Extract numbers from a file:
 
 ```bash
-# run all unit tests and semantics checks (requirements: pytest, mypy and ruff)
-pytest && mypy tests && mypy src && ruff check
-
-# usage without installation
-python3 -m src.i2w 123
-
-# sample script (assuming i2w package is installed)
-python3 sample/i2w2.py
-
-# extract numbers from a file
-grep -Eo -- '-?[0-9]+' README.md | python3 -m src.i2w
-
-# largest positive 999-illion in short scale
-PYTHONINTMAXSTRDIGITS=0 python3 <<< "a=1000 ; n=999 ; print(a*10**(3*n+3)-1)" | python3 -m src.i2w -l en_US
-
-# largest negative 999-illion in short scale
-PYTHONINTMAXSTRDIGITS=0 python3 <<< "a=-1000 ; n=999 ; print(a*10**(3*n+3)+1)" | python3 -m src.i2w -l en_US
-
-# largest positive 999-illion in long scale
-PYTHONINTMAXSTRDIGITS=0 python3 <<< "a=1000000 ; n=999 ; print(a*10**(6*n)-1)" | python3 -m src.i2w -l en_GB
-python3 -m src.i2w -l en_GB $(PYTHONINTMAXSTRDIGITS=0 python3 <<< "a=1000000 ; n=999 ; print(a*10**(6*n)-1)")
-
-# largest negative 999-illion in long scale
-PYTHONINTMAXSTRDIGITS=0 python3 <<< "a=-1000000 ; n=999 ; print(a*10**(6*n)+1)" | python3 -m src.i2w -l en_GB
-
-# googol and googolplex
-PYTHONINTMAXSTRDIGITS=0 python3 <<< "print(10**100)" | python3 -m src.i2w -l C
-PYTHONINTMAXSTRDIGITS=0 python3 <<< "print(10**10**100)" | python3 -m src.i2w -l C # the command before the pipe never finished in my machine
-
-# performance comparison on an old mac mid-2015
-PYTHONINTMAXSTRDIGITS=0 python3 <<< "print(10**(3*1000+3))" | time python3 -m src.i2w -l C # ~0.1 s
-PYTHONINTMAXSTRDIGITS=0 python3 <<< "print(10**(3*10000+3))" | time python3 -m src.i2w -l C # ~0.1 s
-PYTHONINTMAXSTRDIGITS=0 python3 <<< "print(10**(3*100000+3))" | time python3 -m src.i2w -l C # ~0.4 s
-PYTHONINTMAXSTRDIGITS=0 python3 <<< "print(10**(3*1000000+3))" | time python3 -m src.i2w -l C # ~7.5 s
-PYTHONINTMAXSTRDIGITS=0 python3 <<< "print(10**(3*10000000+3))" | time python3 -m src.i2w -l C # ~192.6 s
+grep -Eo -- '-?[0-9]+' README.md | i2w
 ```
+
+## Uninstallation
+
+```bash
+pip uninstall i2w
+```
+
+## Contributing
+
+For development information, testing, and advanced examples, see [doc/development.md](doc/development.md).
+
+## License
+
+See LICENSE file for details.
