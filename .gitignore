@@ -4,6 +4,7 @@ __pycache__/
 /.mypy_cache/
 /.ruff_cache/
 /build/
+/dist/
 /requirements-dev.txt
 /requirements.txt
 /venv/
