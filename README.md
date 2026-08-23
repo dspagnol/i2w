@@ -38,6 +38,9 @@ zero
 one
 minus thirty-two
 one million
+
+$ i2w 100000000000000000000000000000000000
+one hundred decillion
 ```
 
 Read from stdin:
