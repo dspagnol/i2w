@@ -10,7 +10,7 @@ name = "i2w"
 authors = [
     { name="Daniel Spagnol", email="dspagnol@gmail.com" },
     ]
-description = "Integer to words. Given an integer, i2w outputs it as words."
+description = "Convert integers to words in multiple languages (e.g., English, Spanish) with flexible number system handling."
 license = { file = "LICENSE" }
 readme = "README.md"
 requires-python = ">=3.12"
