@@ -664,6 +664,18 @@ class TestFallbackMechanism:
         # Should fall back to default (None, None) level
         assert loc.large_number_invariable is True  # Default value
 
+    def test_number_name_none_stops_territory_fallback(self):
+        """Test that None in NUMBER_NAMES blocks inheritance for a territory key."""
+        loc_be = Localization(locale_name="fr_BE")
+        loc_ch = Localization(locale_name="fr_CH")
+
+        # fr_BE inherits 80 from fr language level.
+        assert loc_be.get_name_from_cache(80) == "quatre-vingts"
+
+        # fr_CH explicitly blocks inheritance for 80 so algorithm builds
+        # "huitante" from tens + units.
+        assert loc_ch.get_name_from_cache(80) == ""
+
 
 class TestEdgeCases:
     """Test edge cases and special scenarios."""

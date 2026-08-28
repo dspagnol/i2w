@@ -4,18 +4,15 @@ from ._types import Enum, LanguageDict
 
 
 class ConverterImplTypeProperty(Enum):
-
     CONVERTER_IMPL_TYPE = enum.auto()
 
 
 class ConverterImplTypeValue(Enum):
-
     SHORT_SCALE = enum.auto()
     LONG_SCALE = enum.auto()
 
 
 class BoolProperty(Enum):
-
     CONJUNCTION_BEFORE_UNITS = enum.auto()
     CONJUNCTION_BEFORE_TENS = enum.auto()
     CONJUNCTION_BEFORE_1_UNIT_IF_LT_80 = enum.auto()
@@ -32,7 +29,6 @@ class BoolProperty(Enum):
 
 
 class StrProperty(Enum):
-
     WORD_SEPARATOR = enum.auto()
     WORD_SEPARATOR_11_99 = enum.auto()
     WORD_SEPARATOR_11_99_CONJUNCTION = enum.auto()
@@ -47,7 +43,6 @@ class StrProperty(Enum):
 
 
 class StrListProperty(Enum):
-
     TENS_NAMES = enum.auto()
     HUNDREDS_NAMES = enum.auto()
     LARGE_NUMBER_SUFFIXES = enum.auto()
@@ -60,7 +55,6 @@ class StrListProperty(Enum):
 
 
 class StrListListProperty(Enum):
-
     LARGE_NUMBER_UNITS_LIASON = enum.auto()
     LARGE_NUMBER_TENS_LIASON = enum.auto()
     LARGE_NUMBER_TENS_I_A = enum.auto()
@@ -68,7 +62,6 @@ class StrListListProperty(Enum):
 
 
 class Gender(Enum):
-
     MALE = enum.auto()
     FEMALE = enum.auto()
 
@@ -534,7 +527,10 @@ STR_LIST_LIST_PROPERTIES: LanguageDict[dict[StrListListProperty, list[list[str]]
 }
 
 
-NUMBER_NAMES: LanguageDict[dict[int, str]] = {
+# "None" means: explicit no-inheritance for this key. The converter will
+# generate the number name algorithmically instead of inheriting from fallback
+# locales.
+NUMBER_NAMES: LanguageDict[dict[int, str | None]] = {
     None: {
         None: {
             0: "zero",
@@ -609,27 +605,21 @@ NUMBER_NAMES: LanguageDict[dict[int, str]] = {
             14: "quatorze",
             15: "quinze",
             16: "seize",
-            17: "",
-            18: "",
-            19: "",
+            17: None,
+            18: None,
+            19: None,
             70: "soixante-dix",
-            71: "",
-            72: "",
-            73: "",
-            74: "",
-            75: "",
-            76: "",
             80: "quatre-vingts",
             90: "quatre-vingt-dix",
         },
         "BE": {
-            70: "",
-            90: "",
+            70: None,
+            90: None,
         },
         "CH": {
-            70: "",
-            80: "",
-            90: "",
+            70: None,
+            80: None,
+            90: None,
         },
     },
     "pt": {

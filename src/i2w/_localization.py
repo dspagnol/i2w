@@ -193,11 +193,14 @@ class Localization:
         if i in self.__cache:
             words = self.__cache[i]
         else:
-            words = self.__get_dict_entry(
+            # NUMBER_NAMES may store None to explicitly block locale fallback for
+            # a key, forcing algorithmic composition for that number.
+            name = self.__get_dict_entry(
                 dictionary=NUMBER_NAMES,
                 key=i,
                 default_value="",
             )
+            words = "" if name is None else name
         return words
 
     def put_name_in_cache(self, i: int, words: str) -> None:
