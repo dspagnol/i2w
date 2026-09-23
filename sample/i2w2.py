@@ -1,7 +1,8 @@
+# Standard library imports
 import logging
 
+# First-party imports
 import i2w
-
 
 logging.basicConfig(level=logging.INFO)
 
