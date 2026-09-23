@@ -170,9 +170,9 @@ Extract all numbers from a file and convert them to words:
 grep -Eo -- '-?[0-9]+' README.md | python3 -m src.i2w
 ```
 
-### Large Number Examples
+### Large Named Numbers
 
-These examples demonstrate i2w's ability to handle very large numbers:
+These examples demonstrate i2w's ability to handle very large numbers with conventional names (up to 999-illion):
 
 **Largest positive 999-illion in short scale:**
 
@@ -204,6 +204,10 @@ PYTHONINTMAXSTRDIGITS=0 python3 <<< "a=-1000000 ; n=999 ; print(a*10**(6*n)+1)" 
 PYTHONINTMAXSTRDIGITS=0 python3 <<< "print(10**100)" | python3 -m src.i2w -l C
 PYTHONINTMAXSTRDIGITS=0 python3 <<< "print(10**10**100)" | python3 -m src.i2w -l C  # may take a very long time
 ```
+
+### Beyond Named Numbers
+
+The program can handle numbers far beyond the conventional 999-illion limit. The performance benchmarks below demonstrate this capability with arbitrarily large numbers:
 
 ### Performance Benchmarks
 
