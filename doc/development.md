@@ -211,14 +211,24 @@ The program can handle numbers far beyond the conventional 999-illion limit. The
 
 ### Performance Benchmarks
 
-Performance comparison on an old Mac mid-2015:
+**Note:** To measure i2w processing time accurately, generate the number to a file first, then time only the conversion (the piping approach includes number generation time).
+
+Performance comparison on an old Intel(R) Core(TM) i5-5257U CPU @ 2.70GHz:
 
 ```bash
-PYTHONINTMAXSTRDIGITS=0 python3 <<< "print(10**(3*1000+3))" | time python3 -m src.i2w -l C          # ~0.1 s
-PYTHONINTMAXSTRDIGITS=0 python3 <<< "print(10**(3*10000+3))" | time python3 -m src.i2w -l C         # ~0.1 s
-PYTHONINTMAXSTRDIGITS=0 python3 <<< "print(10**(3*100000+3))" | time python3 -m src.i2w -l C        # ~0.4 s
-PYTHONINTMAXSTRDIGITS=0 python3 <<< "print(10**(3*1000000+3))" | time python3 -m src.i2w -l C       # ~7.5 s
-PYTHONINTMAXSTRDIGITS=0 python3 <<< "print(10**(3*10000000+3))" | time python3 -m src.i2w -l C      # ~192.6 s
+# Generate each number once
+PYTHONINTMAXSTRDIGITS=0 python3 <<< "print(10**(3*1000+3))" > /tmp/n1000.txt
+PYTHONINTMAXSTRDIGITS=0 python3 <<< "print(10**(3*10000+3))" > /tmp/n10000.txt
+PYTHONINTMAXSTRDIGITS=0 python3 <<< "print(10**(3*100000+3))" > /tmp/n100000.txt
+PYTHONINTMAXSTRDIGITS=0 python3 <<< "print(10**(3*1000000+3))" > /tmp/n1000000.txt
+PYTHONINTMAXSTRDIGITS=0 python3 <<< "print(10**(3*10000000+3))" > /tmp/n10000000.txt
+
+# Then time only i2w processing
+time -p python3 -m src.i2w -l C < /tmp/n1000.txt      #  ~ 0.1 s
+time -p python3 -m src.i2w -l C < /tmp/n10000.txt     #  ~ 0.1 s
+time -p python3 -m src.i2w -l C < /tmp/n100000.txt    #  ~ 0.5 s
+time -p python3 -m src.i2w -l C < /tmp/n1000000.txt   #  ~ 5.2 s
+time -p python3 -m src.i2w -l C < /tmp/n10000000.txt  # ~ 71.8 s
 ```
 
 ## Building and Distribution
