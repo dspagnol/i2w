@@ -52,7 +52,7 @@ class BrazilianPortuguese(Localized):
 class SequentialNumbersMixin(Localized):
     def test_conversion(self):
         converter = Converter(self.get_locale())
-        (i, names) = self.get_test_data()
+        i, names = self.get_test_data()
         for name in names:
             assert converter.to_words(i=i) == name, f"i = {i}"
             i += 1
