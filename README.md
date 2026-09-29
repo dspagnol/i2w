@@ -147,6 +147,9 @@ pip uninstall i2w
 
 For development information, testing, and advanced examples, see [doc/development.md](doc/development.md).
 
+For release instructions (tagging and creating GitHub releases), see the
+"Push and release" section in the development guide: [doc/development.md](doc/development.md#push-and-release)
+
 ## License
 
 See LICENSE file for details.

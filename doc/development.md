@@ -141,8 +141,52 @@ After bumping:
 git push origin main
 git push origin --tags
 
-# Go to GitHub and create a release from the tag
-# The release.yml workflow will automatically publish to PyPI
+```
+
+Create the release on GitHub (web):
+
+- Open your repository on GitHub → "Releases" → "Draft a new release".
+- Choose the tag you pushed (for example `v0.0.3`) or create it from the form.
+- Use a concise release title and paste the release notes using the template below.
+- Publish the release when ready — the `release.yml` workflow will automatically
+   publish to PyPI once the release exists and CI verification passes.
+
+Example release notes template (copy into the GitHub Release description):
+
+```
+v0.0.3 — Patch release
+
+### Summary
+Short, one-line summary of the release purpose.
+
+### Changes
+- Fix: Short description of the security hardening for CLI integer parsing.
+- Chore: Minor tooling and documentation updates.
+
+### Notes
+- No user-facing API changes. Consumers can upgrade safely.
+```
+
+Create the release using the `gh` CLI (alternative):
+
+```bash
+# Prepare a file with the release notes
+cat > release-notes.md <<'EOF'
+v0.0.3 — Patch release
+
+### Summary
+Short, one-line summary of the release purpose.
+
+### Changes
+- Fix: Short description of the security hardening for CLI integer parsing.
+- Chore: Minor tooling and documentation updates.
+
+### Notes
+- No user-facing API changes. Consumers can upgrade safely.
+EOF
+
+# Create the release (replace v0.0.3 with your tag)
+gh release create v0.0.3 --title "v0.0.3 — Patch release" --notes-file release-notes.md
 ```
 
 ## Running Tests and Checks
