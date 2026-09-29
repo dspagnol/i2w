@@ -6,6 +6,8 @@ A Python library to convert integers to their word representations in multiple l
 
 **i2w** is primarily a **library for programmers** that provides robust, locale-aware integer-to-words conversion. It comes with a command-line interface for convenience and testing.
 
+The project prioritizes result accuracy and correct locale-specific wording over supporting a very large number of languages; we favor precise conversions for the included locales.
+
 ## Features
 
 - **Multi-language support**: English, French, Portuguese, and Spanish

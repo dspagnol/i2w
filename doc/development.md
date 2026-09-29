@@ -153,17 +153,17 @@ Create the release on GitHub (web):
 
 Example release notes template (copy into the GitHub Release description):
 
-```
+```markdown
 v0.0.3 — Patch release
 
-### Summary
+*Summary*
 Short, one-line summary of the release purpose.
 
-### Changes
+*Changes*
 - Fix: Short description of the security hardening for CLI integer parsing.
 - Chore: Minor tooling and documentation updates.
 
-### Notes
+*Notes*
 - No user-facing API changes. Consumers can upgrade safely.
 ```
 
@@ -174,14 +174,14 @@ Create the release using the `gh` CLI (alternative):
 cat > release-notes.md <<'EOF'
 v0.0.3 — Patch release
 
-### Summary
+*Summary*
 Short, one-line summary of the release purpose.
 
-### Changes
+*Changes*
 - Fix: Short description of the security hardening for CLI integer parsing.
 - Chore: Minor tooling and documentation updates.
 
-### Notes
+*Notes*
 - No user-facing API changes. Consumers can upgrade safely.
 EOF
 
