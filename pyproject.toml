@@ -1,7 +1,6 @@
 [build-system]
 requires = [
     "setuptools",
-    "setuptools-scm",
     ]
 build-backend = "setuptools.build_meta"
 
@@ -103,6 +102,13 @@ typeCheckingMode = "strict"
 pythonVersion = "3.12"
 venvPath = "."
 venv = "venv"
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+
+[tool.mypy]
+python_version = "3.12"
+mypy_path = "src"
 
 [tool.black]
 line-length = 88

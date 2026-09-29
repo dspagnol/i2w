@@ -1,5 +1,6 @@
 import locale
 import re
+import typing
 
 from ._constants import (
     BOOL_PROPERTIES,
@@ -23,64 +24,29 @@ from .exception import LocalizationError
 class Localization:
     """Layer on top of multi-language objects for translations and rules."""
 
-    def __init__(self, locale_name: str | None = None) -> None:
+    def __init__(
+        self,
+        locale_name: str | None = None,
+        strict: bool | None = None,
+    ) -> None:
         """Create a localization object.
 
         Args:
-            locale_name: POSIX format locale with optional language, territory,
-                         codeset, and modifier components (e.g., 'en_US',
-                         'fr_FR.UTF-8').
-
-                         When a language-only code is provided (e.g., 'en', 'fr'),
-                         the constructor automatically deduces the most common
-                         territory for that language:
-                         - 'en' -> 'en_US'
-                         - 'fr' -> 'fr_FR'
-                         - 'es' -> 'es_ES'
-                         - 'pt' -> 'pt_PT'
-
-                         If None or empty string, defaults to the system's
-                         environment locale.
-
-                         Supported locale formats:
-                         - 'lang' (territory auto-deduced)
-                         - 'lang_TERRITORY'
-                         - 'lang_TERRITORY.codeset'
-
-                         Example supported locales:
-                         - English: en, en_US, en_GB
-                         - French: fr, fr_FR, fr_BE, fr_CH, fr_CA
-                         - Spanish: es, es_ES
-                         - Portuguese: pt, pt_PT, pt_BR
+            locale_name: POSIX locale with optional language, territory, and codeset
+                components (for example: 'en_US', 'fr_FR.UTF-8'). If None, the
+                system locale is used.
+            strict: Locale validation mode. True requires explicit locale support,
+                False applies closest-match fallback, and None means strict mode
+                only when locale_name is explicitly provided.
         """
+        if strict is None:
+            strict = locale_name is not None
+
         self.__language: str | None = None  # ISO 639
         self.__territory: str | None = None  # ISO 3166-1 alpha-2
 
-        language_code: str | None = None
-        if locale_name is None:
-            language_code, _encoding = locale.getlocale()
-            logger.debug("detected locale: %s", language_code)
-        else:
-            language_code = locale.normalize(localename=locale_name)
-        language_and_territory: str | None = None
-        if language_code is not None:
-            pattern = r"(\w+)(?:\.[\w-]+)?"
-            match = re.match(pattern, language_code)
-            if match:
-                language_and_territory = match.group(1)
-            else:
-                raise LocalizationError(language_code)
-        if language_and_territory is not None and language_and_territory != "C":
-            language: str | None = None
-            territory: str | None = None
-            pattern = r"([a-z]{2,3})(?:_([A-Z]{2}))?"
-            match = re.match(pattern, language_and_territory)
-            if match:
-                language, territory = match.group(1), match.group(2)
-            else:
-                raise LocalizationError(language_and_territory)
-            self.__language = language
-            self.__territory = territory
+        self.__set_locale(locale_name=locale_name, strict=strict)
+
         logger_d1.debug("using language:  %s", self.__language)
         logger_d1.debug("using territory: %s", self.__territory)
 
@@ -180,6 +146,147 @@ class Localization:
             key=StrListListProperty.LARGE_NUMBER_HUNDREDS_LIASON,
         )
         self.__cache: dict[int, str] = {}
+
+    @staticmethod
+    def __all_locale_dictionaries() -> tuple[LanguageDict[dict[object, object]], ...]:
+        return (
+            typing.cast(LanguageDict[dict[object, object]], BOOL_PROPERTIES),
+            typing.cast(
+                LanguageDict[dict[object, object]],
+                CONVERTER_IMPL_TYPE_PROPERTIES,
+            ),
+            typing.cast(LanguageDict[dict[object, object]], NUMBER_NAMES),
+            typing.cast(LanguageDict[dict[object, object]], STR_PROPERTIES),
+            typing.cast(LanguageDict[dict[object, object]], STR_LIST_PROPERTIES),
+            typing.cast(
+                LanguageDict[dict[object, object]],
+                STR_LIST_LIST_PROPERTIES,
+            ),
+        )
+
+    @staticmethod
+    def __extract_locale_token(locale_name: str) -> str:
+        token = locale_name.split(".", maxsplit=1)[0]
+        token = token.split("@", maxsplit=1)[0]
+        return token
+
+    def __parse_locale_token(self, locale_token: str) -> tuple[str | None, str | None]:
+        if locale_token == "C":
+            return (None, None)
+
+        match = re.fullmatch(r"([A-Za-z]{2,3})(?:_([A-Za-z]{2}))?", locale_token)
+        if not match:
+            raise LocalizationError(locale_token)
+
+        language = match.group(1).lower()
+        territory = match.group(2)
+        if territory is not None:
+            territory = territory.upper()
+        return (language, territory)
+
+    def __has_explicit_territory(self, locale_name: str) -> bool:
+        token = self.__extract_locale_token(locale_name)
+        return re.fullmatch(r"[A-Za-z]{2,3}_[A-Za-z]{2}", token) is not None
+
+    def __canonical_territory(self, language: str) -> str | None:
+        normalized = locale.normalize(localename=language)
+        token = self.__extract_locale_token(normalized)
+        match = re.fullmatch(r"[A-Za-z]{2,3}_([A-Za-z]{2})", token)
+        if not match:
+            return None
+        return match.group(1).upper()
+
+    def __supported_territories_by_language(self) -> dict[str, set[str]]:
+        supported: dict[str, set[str]] = {}
+        for dictionary in self.__all_locale_dictionaries():
+            for language, territory_dict in dictionary.items():
+                if language is None:
+                    continue
+                if language not in supported:
+                    supported[language] = set()
+                for territory in territory_dict:
+                    if territory is not None:
+                        supported[language].add(territory)
+        return supported
+
+    def __resolve_supported_locale(
+        self,
+        language: str | None,
+        territory: str | None,
+        strict: bool,
+        territory_explicitly_requested: bool,
+    ) -> tuple[str | None, str | None]:
+        if language is None:
+            return (None, None)
+
+        supported_territories_by_language = self.__supported_territories_by_language()
+        if language not in supported_territories_by_language:
+            if strict:
+                bad_locale = (
+                    language if territory is None else f"{language}_{territory}"
+                )
+                raise LocalizationError(bad_locale)
+            logger_d1.debug(
+                "unsupported language '%s'; falling back to default",
+                language,
+            )
+            return (None, None)
+
+        supported_territories = supported_territories_by_language[language]
+        canonical_territory = self.__canonical_territory(language)
+
+        strict_territories = set(supported_territories)
+        if canonical_territory is not None:
+            strict_territories.add(canonical_territory)
+
+        if (
+            strict
+            and territory_explicitly_requested
+            and territory not in strict_territories
+        ):
+            raise LocalizationError(f"{language}_{territory}")
+
+        if territory is None:
+            return (language, canonical_territory)
+
+        if territory in strict_territories:
+            return (language, territory)
+
+        if strict:
+            raise LocalizationError(f"{language}_{territory}")
+
+        logger_d1.debug(
+            "unsupported territory '%s' for language '%s'; falling back to '%s'",
+            territory,
+            language,
+            canonical_territory,
+        )
+        return (language, canonical_territory)
+
+    def __set_locale(self, locale_name: str | None, strict: bool) -> None:
+        territory_explicitly_requested = False
+        normalized_locale: str
+
+        if locale_name is None:
+            detected_locale, _encoding = locale.getlocale()
+            logger.debug("detected locale: %s", detected_locale)
+            normalized_locale = detected_locale if detected_locale is not None else "C"
+        else:
+            if not locale_name:
+                raise LocalizationError(locale_name)
+            territory_explicitly_requested = self.__has_explicit_territory(locale_name)
+            normalized_locale = locale.normalize(localename=locale_name)
+
+        locale_token = self.__extract_locale_token(normalized_locale)
+        language, territory = self.__parse_locale_token(locale_token)
+        language, territory = self.__resolve_supported_locale(
+            language=language,
+            territory=territory,
+            strict=strict,
+            territory_explicitly_requested=territory_explicitly_requested,
+        )
+        self.__language = language
+        self.__territory = territory
 
     def get_impl_type(self) -> ConverterImplTypeValue:
         return self.__get_dict_entry(
@@ -460,9 +567,7 @@ class Localization:
             language = None
         dict_language: TerritoryDict[dict[K, V]] = dictionary[language]
         territory: str | None = self.__territory
-        if territory not in dict_language:
-            dict_language[territory] = {}
-        dict_territory: dict[K, V] = dict_language[territory]
+        dict_territory: dict[K, V] = dict_language.get(territory, {})
         return (
             dict_territory,
             dict_language[None] if None in dict_language else dictionary[None][None],

@@ -1,8 +1,17 @@
-#!/bin/env sh
+#!/usr/bin/env sh
+
+set -eu
+
+root_dir_pathname="$(dirname "$0")/.."
+
+cd "$root_dir_pathname"
 
 # Format code
-black --line-length=88 src/i2w/
+black --line-length=88 src/i2w/ tests/
 
 # Check compliance
-ruff check src/i2w/
-black --check src/i2w/
+ruff check src tests
+black --check src/i2w/ tests/
+mypy tests
+mypy src
+pytest -q

@@ -1,6 +1,6 @@
-from src.i2w._constants import Gender
-from src.i2w._illion import IllionConverter
-from src.i2w._localization import Localization
+from i2w._constants import Gender
+from i2w._illion import IllionConverter
+from i2w._localization import Localization
 
 
 class TestIllionNLT10:
@@ -22,22 +22,6 @@ class TestIllionNLT10:
         return [
             (
                 "C",
-                0,
-                False,
-                [
-                    "million",
-                    "billion",
-                    "trillion",
-                    "quadrillion",
-                    "quintillion",
-                    "sextillion",
-                    "septillion",
-                    "octillion",
-                    "nonillion",
-                ],
-            ),
-            (
-                "en_CA",
                 0,
                 False,
                 [

@@ -11,11 +11,11 @@ Tests cover:
 
 import pytest
 
-from src.i2w._constants import (
+from i2w._constants import (
     ConverterImplTypeValue,
 )
-from src.i2w._localization import Localization
-from src.i2w.exception import LocalizationError
+from i2w._localization import Localization
+from i2w.exception import LocalizationError
 
 
 class TestLocalizationInitialization:
@@ -80,6 +80,18 @@ class TestLocalizationInitialization:
         """Test that numeric locale raises LocalizationError."""
         with pytest.raises(LocalizationError):
             Localization(locale_name="123_AB")  # Numbers fail the pattern
+
+    def test_initialization_with_unsupported_language_raises_error_in_strict_mode(self):
+        """Test that unsupported explicit language raises in strict mode."""
+        with pytest.raises(LocalizationError):
+            Localization(locale_name="ja")
+
+    def test_initialization_with_unsupported_territory_raises_error_in_strict_mode(
+        self,
+    ):
+        """Test that unsupported explicit territory raises in strict mode."""
+        with pytest.raises(LocalizationError):
+            Localization(locale_name="en_CA")
 
 
 class TestLocalizationLanguageParsing:
@@ -659,8 +671,8 @@ class TestFallbackMechanism:
 
     def test_default_fallback_when_language_not_in_dict(self):
         """Test fallback to default when language not in dictionary."""
-        # Create localization with unsupported language - should use defaults
-        loc = Localization(locale_name="ja")
+        # Unsupported locale can be accepted in permissive mode and use defaults.
+        loc = Localization(locale_name="ja", strict=False)
         # Should fall back to default (None, None) level
         assert loc.large_number_invariable is True  # Default value
 

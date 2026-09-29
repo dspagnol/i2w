@@ -1,14 +1,20 @@
 #!/usr/bin/env sh
 
+set -eu
+
 root_dir_pathname="$(dirname "$0")/.."
 
 cd "$root_dir_pathname"
 
-python3 -m venv --copies venv
+python_executable="python3"
+if command -v python3.12 >/dev/null 2>&1; then
+	python_executable="python3.12"
+fi
+
+"$python_executable" -m venv --copies venv
 . venv/bin/activate
-pip3 install --upgrade pip
-pip3 install pip-autoremove pip3-autoremove
-pip3 install pip-tools
-pip-compile --strip-extras -o requirements.txt
-pip-compile --strip-extras --extra dev -o requirements-dev.txt
-pip-sync requirements.txt requirements-dev.txt
+python3 -m pip install --upgrade pip
+python3 -m pip install pip-tools
+pip-compile --strip-extras scripts/requirements-dev.in --output-file scripts/requirements-dev.txt
+pip-sync scripts/requirements-dev.txt
+python3 -m pip install -e .

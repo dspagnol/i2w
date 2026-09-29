@@ -54,8 +54,8 @@ print(converter_pt.to_words(1000000))  # "um milhão"
 
 The `locale_name` parameter accepts POSIX locale strings (e.g., `"en_US"`, `"fr_FR"`, `"pt_BR"`):
 
-- **Default behavior**: If `locale_name` is not specified or is an empty string, the library automatically uses the system's environment locale
-- **Override locale**: Explicitly pass a locale string to override the system locale
+- **Default behavior**: If `locale_name` is not specified, the library uses the system environment locale and applies the closest supported locale when needed
+- **Override locale**: Explicitly passed locales are validated strictly
 
 Supported locales include:
 
@@ -94,7 +94,7 @@ Print help and available options:
 
 ```bash
 $ i2w -h
-usage: i2w [-h] [--locale LOCALE] [--verbose] [numbers ...]
+usage: i2w [-h] [--locale LOCALE] [--verbose] [--max-str-digits MAX_STR_DIGITS] [numbers ...]
 
 positional arguments:
   numbers
@@ -103,7 +103,11 @@ options:
   -h, --help           show this help message and exit
   --locale, -l LOCALE
   --verbose, -v
+  --max-str-digits MAX_STR_DIGITS
 ```
+
+By default, CLI integer parsing uses Python's safe digit limit. For trusted workloads
+that require extremely large integers, use `--max-str-digits 0`.
 
 ### Locale-Specific Conversion
 

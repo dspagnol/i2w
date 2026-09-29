@@ -12,7 +12,7 @@ class Converter:
         __impl: Private implementation instance providing the actual conversion logic.
     """
 
-    def __init__(self, locale_name: str = "") -> None:
+    def __init__(self, locale_name: str | None = None) -> None:
         """Initialize converter with optional locale override.
 
         Args:
@@ -26,8 +26,8 @@ class Converter:
                         - 'es' becomes 'es_ES'
                         - 'pt' becomes 'pt_PT'
 
-                        If empty or not provided, the system's environment locale
-                        is used automatically.
+                        If not provided, the system's environment locale is used.
+                        Explicitly provided locale values are validated strictly.
 
                         Supported locales include:
                         - English: en, en_US, en_GB
@@ -35,14 +35,17 @@ class Converter:
                         - Spanish: es, es_ES
                         - Portuguese: pt, pt_PT, pt_BR
 
-                        Defaults to system locale (empty string).
+                        Defaults to system locale.
         """
         from ._constants import ConverterImplTypeValue
         from ._converter import ConverterImpl, ConverterRegistrar
         from ._localization import Localization
         from ._logging import logger
 
-        localization: Localization = Localization(locale_name=locale_name)
+        localization: Localization = Localization(
+            locale_name=locale_name,
+            strict=(locale_name is not None),
+        )
         impl_type: ConverterImplTypeValue = localization.get_impl_type()
         logger.debug("converter: %s", str(impl_type))
         self.__impl: ConverterImpl = ConverterRegistrar.get_class(type_id=impl_type)(

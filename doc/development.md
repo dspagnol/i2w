@@ -17,7 +17,9 @@ This script:
 - Creates a Python virtual environment (`venv/`)
 - Upgrades pip
 - Installs pip-tools (for managing locked dependencies)
-- Compiles and installs all dev requirements
+- Compiles `scripts/requirements-dev.txt` for Python 3.12 compatibility
+- Syncs dependencies from the lockfile
+- Installs the project in editable mode
 
 ### Option 2: Manual setup
 
@@ -38,6 +40,9 @@ pip install pip-tools
 
 # Install dev requirements
 pip install -r scripts/requirements-dev.txt
+
+# Install project in editable mode
+pip install -e .
 ```
 
 ## Activating the Virtual Environment
@@ -55,6 +60,10 @@ Your prompt should show `(venv)` prefix when activated.
 
 ### Adding a new dev dependency
 
+For best compatibility, regenerate lockfiles using Python 3.12 (the minimum
+supported runtime). The `scripts/venv_create` helper prefers `python3.12`
+automatically when available.
+
 1. Add the package to `scripts/requirements-dev.in`:
 
    ```ini
@@ -69,7 +78,7 @@ Your prompt should show `(venv)` prefix when activated.
 2. Regenerate the locked requirements:
 
    ```bash
-   pip-compile scripts/requirements-dev.in --output-file=scripts/requirements-dev.txt
+   pip-compile --strip-extras scripts/requirements-dev.in --output-file=scripts/requirements-dev.txt
    ```
 
 3. Install the updated dependencies:
@@ -81,13 +90,13 @@ Your prompt should show `(venv)` prefix when activated.
 Or combine in one command:
 
 ```bash
-pip-compile scripts/requirements-dev.in --output-file=scripts/requirements-dev.txt && pip-sync scripts/requirements-dev.txt
+pip-compile --strip-extras scripts/requirements-dev.in --output-file=scripts/requirements-dev.txt && pip-sync scripts/requirements-dev.txt
 ```
 
 ### Updating all dev dependencies to latest versions
 
 ```bash
-pip-compile --upgrade scripts/requirements-dev.in --output-file=scripts/requirements-dev.txt
+pip-compile --strip-extras --upgrade scripts/requirements-dev.in --output-file=scripts/requirements-dev.txt
 pip-sync scripts/requirements-dev.txt
 ```
 
@@ -141,15 +150,7 @@ git push origin --tags
 Run all unit tests and semantic checks (requires: pytest, mypy, and ruff):
 
 ```bash
-pytest && mypy tests && mypy src && ruff check
-```
-
-## Usage Without Installation
-
-Test the package without installing it:
-
-```bash
-python3 -m src.i2w 123
+pytest && ruff check src tests && mypy tests && mypy src
 ```
 
 ## Sample Script
@@ -167,7 +168,7 @@ python3 sample/i2w2.py
 Extract all numbers from a file and convert them to words:
 
 ```bash
-grep -Eo -- '-?[0-9]+' README.md | python3 -m src.i2w
+grep -Eo -- '-?[0-9]+' README.md | i2w
 ```
 
 ### Large Named Numbers
@@ -177,32 +178,32 @@ These examples demonstrate i2w's ability to handle very large numbers with conve
 **Largest positive 999-illion in short scale:**
 
 ```bash
-PYTHONINTMAXSTRDIGITS=0 python3 <<< "a=1000 ; n=999 ; print(a*10**(3*n+3)-1)" | python3 -m src.i2w -l en_US
+PYTHONINTMAXSTRDIGITS=0 python3 <<< "a=1000 ; n=999 ; print(a*10**(3*n+3)-1)" | i2w --max-str-digits 0 -l en_US
 ```
 
 **Largest negative 999-illion in short scale:**
 
 ```bash
-PYTHONINTMAXSTRDIGITS=0 python3 <<< "a=-1000 ; n=999 ; print(a*10**(3*n+3)+1)" | python3 -m src.i2w -l en_US
+PYTHONINTMAXSTRDIGITS=0 python3 <<< "a=-1000 ; n=999 ; print(a*10**(3*n+3)+1)" | i2w --max-str-digits 0 -l en_US
 ```
 
 **Largest positive 999-illion in long scale:**
 
 ```bash
-PYTHONINTMAXSTRDIGITS=0 python3 <<< "a=1000000 ; n=999 ; print(a*10**(6*n)-1)" | python3 -m src.i2w -l en_GB
+PYTHONINTMAXSTRDIGITS=0 python3 <<< "a=1000000 ; n=999 ; print(a*10**(6*n)-1)" | i2w --max-str-digits 0 -l en_GB
 ```
 
 **Largest negative 999-illion in long scale:**
 
 ```bash
-PYTHONINTMAXSTRDIGITS=0 python3 <<< "a=-1000000 ; n=999 ; print(a*10**(6*n)+1)" | python3 -m src.i2w -l en_GB
+PYTHONINTMAXSTRDIGITS=0 python3 <<< "a=-1000000 ; n=999 ; print(a*10**(6*n)+1)" | i2w --max-str-digits 0 -l en_GB
 ```
 
 **Googol and Googolplex:**
 
 ```bash
-PYTHONINTMAXSTRDIGITS=0 python3 <<< "print(10**100)" | python3 -m src.i2w -l C
-PYTHONINTMAXSTRDIGITS=0 python3 <<< "print(10**10**100)" | python3 -m src.i2w -l C  # may take a very long time
+PYTHONINTMAXSTRDIGITS=0 python3 <<< "print(10**100)" | i2w --max-str-digits 0 -l C
+PYTHONINTMAXSTRDIGITS=0 python3 <<< "print(10**10**100)" | i2w --max-str-digits 0 -l C  # may take a very long time
 ```
 
 ### Beyond Named Numbers
@@ -224,11 +225,11 @@ PYTHONINTMAXSTRDIGITS=0 python3 <<< "print(10**(3*1000000+3))" > /tmp/n1000000.t
 PYTHONINTMAXSTRDIGITS=0 python3 <<< "print(10**(3*10000000+3))" > /tmp/n10000000.txt
 
 # Then time only i2w processing
-time -p python3 -m src.i2w -l C < /tmp/n1000.txt      #  ~ 0.1 s
-time -p python3 -m src.i2w -l C < /tmp/n10000.txt     #  ~ 0.1 s
-time -p python3 -m src.i2w -l C < /tmp/n100000.txt    #  ~ 0.5 s
-time -p python3 -m src.i2w -l C < /tmp/n1000000.txt   #  ~ 5.2 s
-time -p python3 -m src.i2w -l C < /tmp/n10000000.txt  # ~ 71.8 s
+time -p i2w --max-str-digits 0 -l C < /tmp/n1000.txt      #  ~ 0.1 s
+time -p i2w --max-str-digits 0 -l C < /tmp/n10000.txt     #  ~ 0.1 s
+time -p i2w --max-str-digits 0 -l C < /tmp/n100000.txt    #  ~ 0.5 s
+time -p i2w --max-str-digits 0 -l C < /tmp/n1000000.txt   #  ~ 5.2 s
+time -p i2w --max-str-digits 0 -l C < /tmp/n10000000.txt  # ~ 71.8 s
 ```
 
 ## Building and Distribution

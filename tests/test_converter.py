@@ -1,7 +1,7 @@
 import abc
 import collections.abc
 
-from src.i2w.converter import Converter
+from i2w.converter import Converter
 
 
 class Localized(abc.ABC):
