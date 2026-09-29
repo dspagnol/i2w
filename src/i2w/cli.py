@@ -3,8 +3,38 @@ import logging
 import sys
 
 from .converter import Converter
-from .exception import I2WError, InvalidInteger
+from .exception import I2WError, InvalidInteger, MaxStrDigitsOutOfBoundsError
 from .logging import LoggingDebugFilter
+
+
+def configure_max_str_digits(max_str_digits: int | None) -> None:
+    """Configure Python's maximum number of string digits for int parsing.
+
+    Args:
+        max_str_digits: Maximum digits accepted by int() conversion.
+            If None, use Python's safe default for this interpreter.
+            If 0, disable the limit (unsafe for untrusted input).
+    """
+    default_limit: int = sys.int_info.default_max_str_digits
+    min_non_zero_limit: int = sys.int_info.str_digits_check_threshold
+
+    if max_str_digits is None:
+        max_str_digits = default_limit
+    elif max_str_digits != 0 and max_str_digits < min_non_zero_limit:
+        raise MaxStrDigitsOutOfBoundsError(
+            min_value=min_non_zero_limit,
+            max_value=sys.maxsize,
+            n=max_str_digits,
+        )
+
+    try:
+        sys.set_int_max_str_digits(maxdigits=max_str_digits)
+    except ValueError as exc:
+        raise MaxStrDigitsOutOfBoundsError(
+            min_value=min_non_zero_limit,
+            max_value=sys.maxsize,
+            n=max_str_digits,
+        ) from exc
 
 
 def initialize_log(verbose_level: int) -> None:
@@ -49,42 +79,42 @@ def parse_arguments() -> argparse.Namespace:
         default=0,
         dest="verbose_level",
     )
-    parser.add_argument("numbers", type=int, nargs="*", default=[])
+    parser.add_argument(
+        "--max-str-digits",
+        type=int,
+        default=None,
+        help=(
+            "Maximum string digits accepted when parsing integers. "
+            "Use 0 to disable the limit (unsafe). Defaults to Python's safe default."
+        ),
+    )
+    parser.add_argument("numbers", type=str, nargs="*", default=[])
     args = parser.parse_args()
     return args
 
 
 def main() -> None:
     """Main entry point for the i2w command-line application."""
-    sys.set_int_max_str_digits(maxdigits=0)
-
     args = parse_arguments()
 
     initialize_log(verbose_level=args.verbose_level)
 
-    def process_number(converter: Converter, x: int | str) -> bool:
+    def process_number(converter: Converter, x: str) -> bool:
         success: bool = False
         try:
-            is_int: bool = True
-            i: int = 0
-            if isinstance(x, int):
-                i = x
-            else:
-                try:
-                    i = int(x)
-                except ValueError:
-                    logging.error(f"invalid integer: '{x}'")
-                    is_int = False
-            if is_int:
-                print(converter.to_words(i=i))
-                success = True
+            i = int(x)
+            print(converter.to_words(i=i))
+            success = True
         except InvalidInteger as e:
             logging.error(str(e))
+        except ValueError:
+            logging.error("invalid integer: '%s'", x)
         return success
 
     success: bool = True
 
     try:
+        configure_max_str_digits(max_str_digits=args.max_str_digits)
         converter = Converter(locale_name=args.locale)
         for s in args.numbers:
             success &= process_number(converter, s)
